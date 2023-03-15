@@ -1,0 +1,40 @@
+---
+- name: Deploy Virtual Machines
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - vm_vars.yml
+
+  tasks:
+
+    - name: Deploy Virtual Machines
+      vmware_guest:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        name: "{{ item.host_name }}"
+        template: "{{ item.vm_template }}"
+        datacenter: "{{ item.datacenter }}"
+        esxi_hostname: "{{ item.esxi_host }}"
+        folder: 'vm'
+        datastore: "{{ item.datastore }}"
+        state: poweredon
+        wait_for_ip_address: no
+        networks:
+          - name: "{{ item.dvswitch }}"
+            device_name: "{{ item.device }}"
+            ip: "{{ item.ip_address }}"
+            netmask: "{{ item.netmask }}"
+            gateway: "{{ item.defaultgw }}"
+            dns_servers: 
+            - "{{ item.dns_server }}"
+            domain: "{{ item.dns_domainname }}"
+        customization:
+          dns_servers:
+            - "{{ item.dns_server }}"
+          domain: "{{ item.dns_domainname }}"
+      loop: "{{ guests }}"
+

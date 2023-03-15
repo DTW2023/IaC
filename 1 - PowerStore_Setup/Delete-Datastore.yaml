@@ -1,0 +1,102 @@
+---
+- name: Delete PowerStore Volume
+  hosts: all
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - ps_vars.yaml
+
+  vars:
+
+  tasks:
+
+
+    - name: Getting WWN for PowerStore Volume
+      dellemc.powerstore.volume:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        vol_name: "{{ vol_name }}"
+        size: "{{ vol_size }}"
+        cap_unit: "{{ vol_capunit }}"
+        state: 'present'
+        mapping_state: 'mapped'
+        hostgroup: "{{ hg_name }}"
+        description: "{{ vol_desc }}"
+      register: wwn_details
+
+
+    - name: saving WWN of PowerStore volume into a variable
+      set_fact: 
+        volume_wwn:  "{{ wwn_details.volume_details.wwn}}"
+
+
+    - name: Remove VMware PowerStore datastore from nodes in cluster
+      vmware_host_datastore:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{ vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        datastore_name: "{{ new_datastore }}"
+        datastore_type: 'vmfs'
+        esxi_hostname: "{{ item.host_name }}"
+        vmfs_device_name: '{{ volume_wwn }}'
+        state: absent
+      loop: "{{ esxi_hosts }}"
+
+
+    - name: Unmapping PowerStore Volume
+      dellemc.powerstore.volume:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        vol_name: "{{ vol_name }}"
+        size: "{{ vol_size }}"
+        cap_unit: "{{ vol_capunit }}"
+        state: 'present'
+        mapping_state: 'unmapped'
+        hostgroup: "{{ hg_name }}"
+        description: "{{ vol_desc }}"
+
+    - name: Remove PowerStore Volume
+      dellemc.powerstore.volume:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        vol_name: "{{ vol_name }}"
+        size: "{{ vol_size }}"
+        cap_unit: "{{ vol_capunit }}"
+        state: 'absent'
+        mapping_state: 'unmapped'
+        hostgroup: "{{ hg_name }}"
+
+
+    - name: Delete Host Group
+      dellemc.powerstore.hostgroup:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        hostgroup_name: "{{ hg_name }}"
+        host_state: 'present-in-group'
+        state: absent
+
+
+    - name: "Remove hosts on powerstore"
+      dellemc.powerstore.host:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        os_type: 'ESXi'
+        detailed_initiators:
+          - port_name: "{{ item.port_name }}"
+            port_type: 'iSCSI'
+        state: absent
+        initiator_state: 'present-in-host'
+        host_name: "{{ item.host_name }}"
+      loop:  "{{ esxi_hosts }}"

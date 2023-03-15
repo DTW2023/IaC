@@ -1,0 +1,231 @@
+
+---
+- hosts: all
+  become: true
+  tasks:
+
+  - name: Yum Check Update
+    command: yum check update
+
+  - name: Add Docker repo 
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
+
+  - name: Install Docker
+    yum: 
+      name: "{{ packages }}"
+      state: present
+    vars:
+      packages:
+      - docker-ce
+      - docker-ce-cli 
+      - containerd.io
+      - epel-release 
+      - open-vm-tools 
+      - device-mapper-persistent-data 
+      - lvm2
+      - yum-utils
+      - git
+
+  - name: Disable SELinux
+    selinux:
+      state: disabled
+
+  - name: edit selinux file
+    lineinfile:
+      path: /etc/sysconfig/selinux
+      regexp: 'SELINUX=enforcing'
+      line: 'SELINUX=disabled'
+      backrefs: yes
+
+  - name: Remove file /etc/containerd/config.toml
+    ansible.builtin.file:
+      path: /etc/containerd/config.toml
+      state: absent
+
+  - name: Start & enable Docker service
+    ansible.builtin.service:
+      name: docker
+      state: started
+      enabled: yes
+
+  - name: Start & enable containerd service
+    ansible.builtin.service:
+      name: containerd
+      state: started
+      enabled: yes
+
+  - name: Add YUM repository for Kubernetes
+    get_url: 
+      url: https://raw.githubusercontent.com/flinty1970/Kubernetes_Lab/main/kubernetes.repo 
+      dest: /etc/yum.repos.d/kubernetes.repo
+      mode: 0755 
+      owner: root
+      group: root
+
+  - name: Remove swapfile from /etc/fstab
+    mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+    with_items:
+      - swap
+      - none
+
+  - name: Disable swap
+    command: swapoff -a
+    when: ansible_swaptotal_mb > 0
+
+  - name: Stop and disable firewalld.
+    service:
+      name: firewalld
+      state: stopped
+      enabled: False
+
+  - name: Add conf for containerd
+    shell: |
+      cat <<EOF >  /etc/sysctl.d/k8s.conf
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
+      EOF
+
+  - name: Apply new settings
+    command: sysctl --system
+
+  - name: Install Kubernetes
+    yum: 
+      name: "{{ packages }}"
+      state: present
+      update_cache: yes
+    vars:
+      packages:
+        - kubelet 
+        - kubeadm 
+        - kubectl
+
+  - name: start kubelet
+    service:
+      name: kubelet
+      state: started
+      enabled: True
+
+  - name: Initialize the Kubernetes cluster using kubeadm command
+    when: inventory_hostname in groups['k8s_master']
+    command: kubeadm init --pod-network-cidr=192.168.0.0/16
+
+  - name: create .kube directory
+    file:
+      path: $HOME/.kube
+      state: directory
+      mode: 0755
+
+  - name: copies admin.conf to user's kube config
+    when: inventory_hostname in groups['k8s_master']
+    command: "{{ item  }}"    
+    with_items:
+    - mkdir -p $HOME/.kube
+    - cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+    - chown root:root $HOME/.kube/config
+    - chmod 0755 $HOME/.kube/config
+
+
+  - name: Retrieve Kubernetes join command that is used to join worker node(s)
+    become: false
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubeadm token create  --print-join-command"
+    register: join_command
+
+  - name: display join_command
+    debug:
+      var: join_command.stdout_lines[0] 
+    when: inventory_hostname in groups['k8s_master']
+
+
+  - name: Send Kubernetes join command to worker nodeis to cluster
+    when: inventory_hostname in groups['k8s_worker']
+    copy: 
+      content: "{{ hostvars['master']['join_command'].stdout_lines[0] }}" 
+      dest: "/tmp/join-command" 
+      mode: 0777
+      
+  - name: Add Workers to Kubernetes Cluster
+    when: inventory_hostname in groups['k8s_worker']
+    command: "sh /tmp/join-command"
+
+  - name: Remove /tmp/join-command
+    ansible.builtin.file:
+      path: /tmp/join-command
+      state: absent
+    
+  - name: Download Networking Script 
+    when: inventory_hostname in groups['k8s_master']
+    get_url:
+      url: https://raw.githubusercontent.com/flinty1970/Kubernetes_Lab/main/networking.sh 
+      dest: /tmp/networking.sh
+      
+  - name: Running Networking Script 
+    when: inventory_hostname in groups['k8s_master']
+    command: "sh /tmp/networking.sh"
+
+  - name: Remove file networking.sh
+    ansible.builtin.file:
+      path: /tmp/networking.sh
+      state: absent
+
+  - name: Install OLM on master
+    when: inventory_hostname in groups['k8s_master']
+    shell: "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.23.1/install.sh | bash -s v0.23.1"
+
+  - name: Install Dell CSI Operator on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f https://operatorhub.io/install/dell-csi-operator.yaml"
+
+  - name: Install Dell CSM Operator on master
+    when: inventory_hostname in groups['k8s_master']
+    shell: "kubectl create -f https://operatorhub.io/install/dell-csm-operator.yaml"
+
+  - name: Download Dell CSI External Snapshotter on master
+    when: inventory_hostname in groups['k8s_master']
+    shell: "cd /tmp ; git clone https://github.com/kubernetes-csi/external-snapshotter/"
+
+  - name: check out version 6.2 of Dell CSI external snapshotter on master
+    when: inventory_hostname in groups['k8s_master']
+    shell: "cd /tmp/external-snapshotter; git checkout release-6.2"
+
+  - name: Remove kustomization files on master, not needed
+    ansible.builtin.file:
+      path: /tmp/external-snapshotter/{{ item }}
+      state: absent
+    when: inventory_hostname in groups['k8s_master']
+    loop:
+      - client/config/crd/kustomization.yaml
+      - deploy/kubernetes/csi-snapshotter/kustomization.yaml
+      - deploy/kubernetes/snapshot-controller/kustomization.yaml
+
+  - name: Apply CRD for Dell external snapshotter on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/external-snapshotter/client/config/crd"
+
+  - name: Deploy Dell External snapshotter on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/external-snapshotter/deploy/kubernetes/snapshot-controller"
+
+  - name: Remove dir /tmp/external-snapshotter on master
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/external-snapshotter
+      state: absent
+
+  - name: Deploy nginx Ingress Controller
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml"
+      
+  - name: Deploy Grafana Operator
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f https://operatorhub.io/install/grafana-operator.yaml"
+      
+  - name: Deploy Prometheus Operator
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  

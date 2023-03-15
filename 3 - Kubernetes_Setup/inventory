@@ -1,0 +1,12 @@
+[k8s_master]
+master ansible_host=master
+
+[k8s_worker]
+worker-01 ansible_host=worker-01
+worker-02 ansible_host=worker-02
+worker-03 ansible_host=worker-03
+
+
+[cluster:children]
+k8s_master
+k8s_worker

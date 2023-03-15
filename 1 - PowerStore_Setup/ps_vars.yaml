@@ -1,0 +1,35 @@
+---
+
+# PowerStore Volume Details
+vol_name: 'esx_vol'
+hg_name: 'esx_datastore'
+new_datastore: 'powerstore'
+vm_name: 'master'
+orig_datastore: 'vsanDatastore'
+vol_size: '800'
+vol_capunit: 'GB'
+hba: 'vmhba65'
+vol_desc: 'DTW ESXi DataStore'
+
+## Base set of PowerStore Variables
+iscsi_target_ip: 192.168.1.20
+array_ip: '192.168.140.20'
+verifycert: false
+user: "{{ lookup('env', 'PS_USERNAME') }}"
+password: "{{ lookup('env', 'PS_PASSWORD') }}"
+
+
+## Base Set of VC Variables
+vc_hostname: 'vcenter01.demo.local'
+validate_certs: false
+vc_username: "{{ lookup('env', 'VC_USERNAME') }}"
+vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
+
+esxi_hosts:
+  - host_name: esxi01.demo.local
+    port_name: iqn.1998-01.com.vmware:esxi01:999701628:65
+  - host_name: esxi02.demo.local
+    port_name: iqn.1998-01.com.vmware:esxi02:380351444:65
+  - host_name: esxi03.demo.local
+    port_name: iqn.1998-01.com.vmware:esxi03:2135904199:65
+

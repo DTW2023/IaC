@@ -1,0 +1,26 @@
+---
+- name: Delete Virtual Machines
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - vm_vars.yml
+
+  tasks:
+
+    - name: Delete Virtual Machines
+      vmware_guest:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        name: "{{ item.host_name }}"
+        datacenter: "{{ item.datacenter }}"
+        esxi_hostname: "{{ item.esxi_host }}"
+        folder: 'vm'
+        force: yes
+        datastore: "{{ item.datastore }}"
+        state: absent
+      loop: "{{ guests }}"
+
