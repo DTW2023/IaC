@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# remove old known hosts entries to avoid man in the middle attack warnings
+rm -rf /root/.ssh/known_hosts
 
 echo -n "Started "
 date
