@@ -12,8 +12,8 @@ hba: 'vmhba65'
 vol_desc: 'DTW ESXi DataStore'
 
 ## Base set of PowerStore Variables
-iscsi_target_ip: 192.168.1.40
-array_ip: '192.168.140.40'
+iscsi_target_ip: 192.168.1.20
+array_ip: '192.168.140.20'
 verifycert: false
 user: "{{ lookup('env', 'PS_USERNAME') }}"
 password: "{{ lookup('env', 'PS_PASSWORD') }}"
