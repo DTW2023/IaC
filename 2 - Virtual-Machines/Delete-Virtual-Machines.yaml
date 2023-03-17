@@ -1,3 +1,4 @@
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, and vmware 7 update 3
 ---
 - name: Delete Virtual Machines
   hosts: localhost

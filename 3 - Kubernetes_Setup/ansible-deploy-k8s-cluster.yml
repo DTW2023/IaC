@@ -1,5 +1,5 @@
-
 ---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
 - hosts: all
   become: true
   tasks:
