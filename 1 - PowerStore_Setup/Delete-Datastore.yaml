@@ -79,8 +79,8 @@
         host: "{{ item.host_name }}"
       loop:  "{{ esxi_hosts }}"
       loop_control:
-        pause: 2
-        
+        pause: 10
+
 #    - name: Delete Host Group
 #      dellemc.powerstore.hostgroup:
 #        password: "{{ password }}"
