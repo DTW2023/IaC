@@ -8,7 +8,7 @@ vol_size: '1000'
 vol_capunit: 'GB'
 vol_desc: 'DTW ESXi DataStore'
 
-## Base set of PowerStore Variables for 3000T
+## Base set of PowerStore Variables for 5000T
 iscsi_target_ip1: 10.10.30.80
 #iscsi_target_ip2: 10.10.30.47
 array_ip: '10.204.20.80'
