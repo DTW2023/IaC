@@ -33,7 +33,7 @@ loop=1
 echo wait for guests to boot up
 while [ $loop -ne 0 ]
 do
-sleep 30
+sleep 10
 ansible -m ping -i inventory all
 if [ $? -eq 0 ] ; then
 	loop=0
@@ -41,7 +41,7 @@ if [ $? -eq 0 ] ; then
 fi
 done
 
-sleep 10
+sleep 5
 
 echo Deploy Kubernetes
 ansible-playbook -i inventory ansible-deploy-k8s-cluster.yml
