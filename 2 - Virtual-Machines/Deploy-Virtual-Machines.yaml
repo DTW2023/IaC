@@ -38,3 +38,5 @@
             - "{{ item.dns_server }}"
           domain: "{{ item.dns_domainname }}"
       loop: "{{ guests }}"
+      loop_control:
+        pause: 2
