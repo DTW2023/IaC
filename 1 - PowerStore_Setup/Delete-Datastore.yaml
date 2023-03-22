@@ -78,7 +78,9 @@
         mapping_state: 'unmapped'
         host: "{{ item.host_name }}"
       loop:  "{{ esxi_hosts }}"
-
+      loop_control:
+        pause: 2
+        
 #    - name: Delete Host Group
 #      dellemc.powerstore.hostgroup:
 #        password: "{{ password }}"
