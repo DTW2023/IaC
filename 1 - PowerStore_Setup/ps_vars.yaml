@@ -5,31 +5,35 @@ vol_name: 'esx_vol'
 hg_name: 'esx_datastore'
 new_datastore: 'powerstore'
 vm_name: 'master'
-orig_datastore: 'vsanDatastore'
-vol_size: '800'
+vol_size: '1000'
 vol_capunit: 'GB'
-hba: 'vmhba65'
 vol_desc: 'DTW ESXi DataStore'
 
-## Base set of PowerStore Variables
-iscsi_target_ip: 192.168.1.20
-array_ip: '192.168.140.20'
+## Base set of PowerStore Variables for 3000T
+iscsi_target_ip1: 10.10.30.46
+iscsi_target_ip2: 10.10.30.47
+array_ip: '10.204.20.46'
 verifycert: false
 user: "{{ lookup('env', 'PS_USERNAME') }}"
 password: "{{ lookup('env', 'PS_PASSWORD') }}"
 
 
 ## Base Set of VC Variables
-vc_hostname: 'vcenter01.demo.local'
+vc_hostname: 'dc3strvc2.storage.local'
 validate_certs: false
 vc_username: "{{ lookup('env', 'VC_USERNAME') }}"
 vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
 
 esxi_hosts:
-  - host_name: esxi01.demo.local
-    port_name: iqn.1998-01.com.vmware:esxi01:999701628:65
-  - host_name: esxi02.demo.local
-    port_name: iqn.1998-01.com.vmware:esxi02:380351444:65
-  - host_name: esxi03.demo.local
-    port_name: iqn.1998-01.com.vmware:esxi03:2135904199:65
-
+  - host_name: dc3strshow01.storage.local
+    port_name: iqn.1998-01.com.vmware:powerstoreesx8-38b8857c
+    hba: vmhba64
+  - host_name: dc3strshow01.storage.local
+    port_name: iqn.1998-01.com.vmware:powerstoreesx9-21942794
+    hba: vmhba64
+  - host_name: dc3strshow01.storage.local
+    port_name: iqn.1998-01.com.vmware:dc3strshow03:1059425365:68
+    hba: vmhba68
+  - host_name: dc3strshow04.storage.local
+    port_name: iqn.1998-01.com.vmware:powerstoreesx4-587b99c9
+    hba: vmhba64
