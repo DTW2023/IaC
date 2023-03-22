@@ -14,9 +14,10 @@ cd ..
 end=`date +%s`
 runtime=$((end-start))
 echo Took $runtime seconds to deploy Volume to ESXi
+echo ""
 
-
-
+sleep 2
+echo ""
 start1=`date +%s`
 echo "Deploy Virtual Machines"
 cd "2 - Virtual-Machines"
@@ -25,8 +26,11 @@ cd ..
 end=`date +%s`
 runtime=$((end-start1))
 echo Took $runtime seconds to deploy Virtual Machines
+echo ""
 
+sleep 2
 
+echo ""
 start2=`date +%s`
 cd "3 - Kubernetes_Setup"
 loop=1
