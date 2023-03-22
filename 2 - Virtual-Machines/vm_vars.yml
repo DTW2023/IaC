@@ -4,7 +4,7 @@ vc_hostname: 'dc3strvc2.storage.local'
 validate_certs: false
 vc_username: "{{ lookup('env', 'VC_USERNAME') }}"
 vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
-
+rp: 'IAC Showcase'
 
 guests:
   - host_name: 'master'
