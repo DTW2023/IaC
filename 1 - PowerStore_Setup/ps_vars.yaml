@@ -2,17 +2,16 @@
 
 # PowerStore Volume Details
 vol_name: 'esx_vol'
-hg_name: 'esx_datastore'
-new_datastore: 'powerstore'
-vm_name: 'master'
+hg_name: 'DTW'
+new_datastore: 'DTW powerstore'
 vol_size: '1000'
 vol_capunit: 'GB'
 vol_desc: 'DTW ESXi DataStore'
 
 ## Base set of PowerStore Variables for 3000T
-iscsi_target_ip1: 10.10.30.46
-iscsi_target_ip2: 10.10.30.47
-array_ip: '10.204.20.46'
+iscsi_target_ip1: 10.10.30.80
+#iscsi_target_ip2: 10.10.30.47
+array_ip: '10.204.20.80'
 verifycert: false
 user: "{{ lookup('env', 'PS_USERNAME') }}"
 password: "{{ lookup('env', 'PS_PASSWORD') }}"
@@ -28,10 +27,10 @@ esxi_hosts:
   - host_name: dc3strshow01.storage.local
     port_name: iqn.1998-01.com.vmware:powerstoreesx8-38b8857c
     hba: vmhba64
-  - host_name: dc3strshow01.storage.local
+  - host_name: dc3strshow02.storage.local
     port_name: iqn.1998-01.com.vmware:powerstoreesx9-21942794
     hba: vmhba64
-  - host_name: dc3strshow01.storage.local
+  - host_name: dc3strshow03.storage.local
     port_name: iqn.1998-01.com.vmware:dc3strshow03:1059425365:68
     hba: vmhba68
   - host_name: dc3strshow04.storage.local

@@ -25,17 +25,17 @@
         host_name: "{{ item.host_name }}"
       loop:  "{{ esxi_hosts }}"
 
-    - name: Create Host Group 
-      dellemc.powerstore.hostgroup:
-        password: "{{ password }}"
-        array_ip: "{{ array_ip }}"
-        user: "{{ user }}"
-        verifycert: "{{ verifycert }}"
-        hostgroup_name: "{{ hg_name }}"
-        host_state: 'present-in-group'
-        state: present
-        hosts: "{{ item.host_name }}"
-      loop: "{{ esxi_hosts }}"
+#    - name: Create Host Group
+#      dellemc.powerstore.hostgroup:
+#        password: "{{ password }}"
+#        array_ip: "{{ array_ip }}"
+#        user: "{{ user }}"
+#        verifycert: "{{ verifycert }}"
+#        hostgroup_name: "{{ hg_name }}"
+#        host_state: 'present-in-group'
+#        state: present
+#        hosts: "{{ item.host_name }}"
+#      loop: "{{ esxi_hosts }}"
 
 
     - name: Creating PowerStore Volume
@@ -49,7 +49,22 @@
         cap_unit: "{{ vol_capunit }}"
         state: 'present'
         mapping_state: 'mapped'
-        hostgroup: "{{ hg_name }}"
+        host: "{{ item.host_name }}"
+        description: "{{ vol_desc }}"
+      loop: "{{ esxi_hosts }}"
+
+    - name: Getting WWN for PowerStore Volume
+      dellemc.powerstore.volume:
+        password: "{{ password }}"
+        array_ip: "{{ array_ip }}"
+        user: "{{ user }}"
+        verifycert: "{{ verifycert }}"
+        vol_name: "{{ vol_name }}"
+        size: "{{ vol_size }}"
+        cap_unit: "{{ vol_capunit }}"
+        state: 'present'
+        mapping_state: 'mapped'
+        host: "{{ esxi_hosts[0].host_name }}"
         description: "{{ vol_desc }}"
       register: wwn_details
 
@@ -69,20 +84,6 @@
       loop: "{{ esxi_hosts }}"
 
     - name: Add Dynamic target iSCSI IP {{ iscsi_target_ip1 }} on ESXi hosts
-      community.vmware.vmware_host_iscsi:
-        hostname: "{{ vc_hostname }}"
-        username: "{{ vc_username }}"
-        password: "{{ vc_password }}"
-        validate_certs: "{{ validate_certs }}"
-        esxi_hostname: "{{ item.host_name }}"
-        iscsi_config:
-          vmhba_name: "{{ item.hba }}"
-          send_target:
-            address: "{{ iscsi_target_ip1 }}"
-        state: present
-      loop: "{{ esxi_hosts }}"
-
-    - name: Add Dynamic target iSCSI IP {{ iscsi_target_ip2 }} on ESXi hosts
       community.vmware.vmware_host_iscsi:
         hostname: "{{ vc_hostname }}"
         username: "{{ vc_username }}"

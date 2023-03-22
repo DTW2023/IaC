@@ -25,4 +25,3 @@
         datastore: "{{ item.datastore }}"
         state: absent
       loop: "{{ guests }}"
-

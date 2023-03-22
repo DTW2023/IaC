@@ -24,13 +24,14 @@
         cap_unit: "{{ vol_capunit }}"
         state: 'present'
         mapping_state: 'mapped'
-        hostgroup: "{{ hg_name }}"
+        #hostgroup: "{{ hg_name }}"
+        host: "{{ esxi_hosts[0].host_name }}"
         description: "{{ vol_desc }}"
       register: wwn_details
 
 
     - name: saving WWN of PowerStore volume into a variable
-      set_fact: 
+      set_fact:
         volume_wwn:  "{{ wwn_details.volume_details.wwn}}"
 
 
@@ -59,8 +60,10 @@
         cap_unit: "{{ vol_capunit }}"
         state: 'present'
         mapping_state: 'unmapped'
-        hostgroup: "{{ hg_name }}"
+        #hostgroup: "{{ hg_name }}"
+        host: "{{ item.host_name }}"
         description: "{{ vol_desc }}"
+      loop: "{{ esxi_hosts }}"
 
     - name: Remove PowerStore Volume
       dellemc.powerstore.volume:
@@ -73,31 +76,31 @@
         cap_unit: "{{ vol_capunit }}"
         state: 'absent'
         mapping_state: 'unmapped'
-        hostgroup: "{{ hg_name }}"
-
-
-    - name: Delete Host Group
-      dellemc.powerstore.hostgroup:
-        password: "{{ password }}"
-        array_ip: "{{ array_ip }}"
-        user: "{{ user }}"
-        verifycert: "{{ verifycert }}"
-        hostgroup_name: "{{ hg_name }}"
-        host_state: 'present-in-group'
-        state: absent
-
-
-    - name: "Remove hosts on powerstore"
-      dellemc.powerstore.host:
-        password: "{{ password }}"
-        array_ip: "{{ array_ip }}"
-        user: "{{ user }}"
-        verifycert: "{{ verifycert }}"
-        os_type: 'ESXi'
-        detailed_initiators:
-          - port_name: "{{ item.port_name }}"
-            port_type: 'iSCSI'
-        state: absent
-        initiator_state: 'present-in-host'
-        host_name: "{{ item.host_name }}"
+        host: "{{ item.host_name }}"
       loop:  "{{ esxi_hosts }}"
+
+#    - name: Delete Host Group
+#      dellemc.powerstore.hostgroup:
+#        password: "{{ password }}"
+#        array_ip: "{{ array_ip }}"
+#        user: "{{ user }}"
+#        verifycert: "{{ verifycert }}"
+#        hostgroup_name: "{{ hg_name }}"
+#        host_state: 'present-in-group'
+#        state: absent
+
+
+#    - name: "Remove hosts on powerstore"
+#      dellemc.powerstore.host:
+#        password: "{{ password }}"
+#        array_ip: "{{ array_ip }}"
+#        user: "{{ user }}"
+#        verifycert: "{{ verifycert }}"
+#        os_type: 'ESXi'
+#        detailed_initiators:
+#          - port_name: "{{ item.port_name }}"
+#            port_type: 'iSCSI'
+#        state: absent
+#        initiator_state: 'present-in-host'
+#        host_name: "{{ item.host_name }}"
+#      loop:  "{{ esxi_hosts }}"
