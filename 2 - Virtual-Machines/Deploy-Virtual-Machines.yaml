@@ -13,7 +13,7 @@
     - name: Deploy Virtual Machines
       vmware_guest:
         hostname: "{{ vc_hostname }}"
-        resource_pool: "{{ item.resource_pool }}"
+        resource_pool: "{{ rp }}"
         username: "{{ vc_username }}"
         password: "{{vc_password }}"
         validate_certs: "{{ validate_certs }}"

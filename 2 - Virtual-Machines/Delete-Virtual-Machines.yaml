@@ -17,6 +17,7 @@
         password: "{{vc_password }}"
         validate_certs: "{{ validate_certs }}"
         name: "{{ item.host_name }}"
+        resource_pool: "{{ rp }}"
         datacenter: "{{ item.datacenter }}"
         esxi_hostname: "{{ item.esxi_host }}"
         folder: 'vm'

@@ -8,7 +8,6 @@ vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
 
 guests:
   - host_name: 'master'
-    resource_pool: 'IAC Showcase'
     ip_address: '10.204.20.150'
     vm_template: 'centos7-golden-image'
     datastore: 'IAC_DTW'
@@ -21,7 +20,6 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'dc3strshow01.storage.local'
   - host_name: 'worker-01'
-    resource_pool: 'IAC Showcase'
     ip_address: '10.204.20.151'
     vm_template: 'centos7-golden-image'
     datastore: 'IAC_DTW'
@@ -34,7 +32,6 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'dc3strshow02.storage.local'
   - host_name: 'worker-02'
-    resource_pool: 'IAC Showcase'
     ip_address: '10.204.20.152'
     vm_template: 'centos7-golden-image'
     datastore: 'IAC_DTW'
@@ -47,7 +44,6 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'dc3strshow03.storage.local'
   - host_name: 'worker-03'
-    resource_pool: 'IAC Showcase'
     ip_address: '10.204.20.153'
     vm_template: 'centos7-golden-image'
     datastore: 'IAC_DTW'
