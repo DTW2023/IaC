@@ -8,6 +8,7 @@ vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
 
 guests:
   - host_name: 'master'
+    resource_pool: 'IAC'
     ip_address: '192.168.1.30'
     vm_template: 'centos7-golden-image'
     datastore: 'vSanDatastore'
@@ -20,6 +21,7 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'esxi01.demo.local'
   - host_name: 'worker-01'
+    resource_pool: 'IAC'
     ip_address: '192.168.1.31'
     vm_template: 'centos7-golden-image'
     datastore: 'vSanDatastore'
@@ -32,6 +34,7 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'esxi02.demo.local'
   - host_name: 'worker-02'
+    resource_pool: 'IAC'
     ip_address: '192.168.1.32'
     vm_template: 'centos7-golden-image'
     datastore: 'vSanDatastore'
@@ -44,6 +47,7 @@ guests:
     device: 'vmxnet3'
     esxi_host: 'esxi03.demo.local'
   - host_name: 'worker-03'
+    resource_pool: 'IAC'
     ip_address: '192.168.1.33'
     vm_template: 'centos7-golden-image'
     datastore: 'vSanDatastore'
@@ -55,4 +59,3 @@ guests:
     netmask: '255.255.255.0'
     device: 'vmxnet3'
     esxi_host: 'esxi01.demo.local'
-
