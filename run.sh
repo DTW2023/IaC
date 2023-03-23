@@ -37,7 +37,7 @@ loop=1
 echo wait for guests to boot up
 while [ $loop -ne 0 ]
 do
-sleep 10
+sleep 15
 ansible -m ping -i inventory all
 if [ $? -eq 0 ] ; then
 	loop=0
