@@ -45,8 +45,9 @@ if [ $? -eq 0 ] ; then
 fi
 done
 
-sleep 5
+sleep 10
 
+echo ""
 echo Deploy Kubernetes
 ansible-playbook -i inventory ansible-deploy-k8s-cluster.yml
 cd ..
