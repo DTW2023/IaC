@@ -123,12 +123,12 @@
         esxi_hostname: "{{ esxi_hosts[0].host_name }}"
         state: present
 
-    - name: Rescan ESXi hosts Storage Adapters one more time
-      vmware_host_scanhba:
-        hostname: "{{ vc_hostname }}"
-        username: "{{ vc_username }}"
-        password: "{{ vc_password }}"
-        validate_certs: "{{ validate_certs }}"
-        esxi_hostname: "{{ item.host_name }}"
-        refresh_storage: true
-      loop: "{{ esxi_hosts }}"
+#    - name: Rescan ESXi hosts Storage Adapters one more time
+#      vmware_host_scanhba:
+#        hostname: "{{ vc_hostname }}"
+#        username: "{{ vc_username }}"
+#        password: "{{ vc_password }}"
+#        validate_certs: "{{ validate_certs }}"
+#        esxi_hostname: "{{ item.host_name }}"
+#        refresh_storage: true
+#      loop: "{{ esxi_hosts }}"
