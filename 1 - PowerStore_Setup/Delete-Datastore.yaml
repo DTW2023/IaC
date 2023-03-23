@@ -77,10 +77,10 @@
         cap_unit: "{{ vol_capunit }}"
         state: 'absent'
         mapping_state: 'unmapped'
-        host: "{{ item.host_name }}"
-      loop:  "{{ esxi_hosts }}"
-      loop_control:
-        pause: 15
+        host: "{{ esxi_hosts[0].host_name }}"
+#      loop:  "{{ esxi_hosts }}"
+#      loop_control:
+#        pause: 15
 
 #    - name: Delete Host Group
 #      dellemc.powerstore.hostgroup:
