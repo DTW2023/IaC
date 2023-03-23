@@ -48,6 +48,8 @@
         vmfs_device_name: '{{ volume_wwn }}'
         state: absent
       loop: "{{ esxi_hosts }}"
+      loop_control:
+        pause: 5
 
 
     - name: Unmapping PowerStore Volume
