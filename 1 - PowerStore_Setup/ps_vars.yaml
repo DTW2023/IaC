@@ -28,12 +28,12 @@ esxi_hosts:
   - host_name: dc3strshow01.storage.local
     port_name: iqn.1998-01.com.vmware:powerstoreesx8-38b8857c
     hba: vmhba64
-  - host_name: dc3strshow03.storage.local
-    port_name: iqn.1998-01.com.vmware:dc3strshow03:1059425365:68
-    hba: vmhba68
   - host_name: dc3strshow04.storage.local
     port_name: iqn.1998-01.com.vmware:powerstoreesx4-587b99c9
     hba: vmhba64
   - host_name: dc3strshow02.storage.local
     port_name: iqn.1998-01.com.vmware:powerstoreesx9-21942794
     hba: vmhba64
+  - host_name: dc3strshow03.storage.local
+    port_name: iqn.1998-01.com.vmware:dc3strshow03:1059425365:68
+    hba: vmhba68
