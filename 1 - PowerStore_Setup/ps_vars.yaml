@@ -2,9 +2,9 @@
 # martin.flint@dell.com
 
 # PowerStore Volume Details
-vol_name: 'esx_vol'
+vol_name: 'DTW2023_powerstore'
 hg_name: 'DTW'
-new_datastore: 'DTW powerstore'
+new_datastore: 'DTW2023_powerstore'
 vol_size: '1000'
 vol_capunit: 'GB'
 vol_desc: 'DTW ESXi DataStore'
