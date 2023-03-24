@@ -1,0 +1,181 @@
+---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
+# martin.flint@dell.com
+
+- hosts: all
+  become: true
+
+  vars:
+    - ps_username: "{{ lookup('env', 'VC_PS_USERNAME') }}"
+    - ps_password: "{{ lookup('env', 'PS_PASSWORD') }}"
+    - ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
+    - nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
+    - ps_id: "{{ lookup('env', 'PS_ID') }}"
+    - ps_namespace: test-powerstore
+
+
+  tasks:
+
+  - name: Generate config.yaml for PowerStore on master
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        arrays:
+        - endpoint: "https://{{ ps_hostname }}/api/rest"  # full URL path to the PowerStore API
+          globalID: "{{ ps_id }}"                         # unique id of the PowerStore array
+          username: "{{ ps_username }}"                   # username for connecting to API
+          password: "{{ ps_password }}"                   # password for connecting to API
+          skipCertificateValidation: true                 # indicates if client side validation of (management)server's certificate can be skipped
+          isDefault: true                                 # treat current array as a default (would be used by storage classes without arrayID parameter)
+          blockProtocol: "auto"                           # what SCSI transport protocol use on node side (FC, ISCSI, NVMeTCP, NVMeFC, None, or auto)
+          nasName: "{{ nas_server }}"                     # what NAS should be used for NFS volumes
+          nfsAcls: "0777"                                 # (Optional) defines permissions - POSIX mode bits or NFSv4 ACLs, to be set on NFS target mount directory.
+      dest: "/tmp/config.yaml"
+      mode: 0777
+
+  - name: Create namespace "{{ ps_namespace }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create ns {{ ps_namespace }}"
+
+  - name: base64 config.yaml on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "base64 -w0 /tmp/config.yaml"
+    register: config
+
+  - name: config.yaml in base64 generated
+    when: inventory_hostname in groups['k8s_master']
+    debug:
+      var: config.stdout_lines[0]
+
+  - name: Generate secret.yaml for PowerStore "{{ ps_id }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: powerstore-config
+          namespace: {{ ps_namespace }}
+        type: Opaque
+        data:
+          config: {{ config.stdout_lines[0] }}
+      dest: "/tmp/secret.yaml"
+      mode: 0777
+
+
+#  - name: Remove file /tmp/config.yaml
+#    when: inventory_hostname in groups['k8s_master']
+#    ansible.builtin.file:
+#      path: /tmp/config.yaml
+#      state: absent
+
+  - name: Generate Custom Resource Definition in namespace "{{ ps_namespace }}"
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        apiVersion: storage.dell.com/v1
+        kind: CSIPowerStore
+        metadata:
+          name: "{{ ps_namespace }}"
+          namespace: "{{ ps_namespace }}"
+        spec:
+          driver:
+            configVersion: v2.5.0
+            replicas: 1
+            dnsPolicy: ClusterFirstWithHostNet
+            forceUpdate: false
+            fsGroupPolicy: ReadWriteOnceWithFSType
+            storageCapacity: true
+            common:
+              image: "dellemc/csi-powerstore:v2.5.0"
+              imagePullPolicy: IfNotPresent
+              envs:
+                - name: X_CSI_POWERSTORE_NODE_NAME_PREFIX
+                  value: "csi"
+                - name: X_CSI_FC_PORTS_FILTER_FILE_PATH
+                  value: "/etc/fc-ports-filter"
+            sideCars:
+              - name: external-health-monitor
+                args: ["--monitor-interval=60s"]
+              - name: provisioner
+                args: ["--capacity-poll-interval=5m"]
+
+            controller:
+              envs:
+                - name: X_CSI_HEALTH_MONITOR_ENABLED
+                  value: "true"
+                - name: X_CSI_NFS_ACLS
+                  value: "0777"
+            node:
+              envs:
+                - name: "X_CSI_POWERSTORE_ENABLE_CHAP"
+                  value: "true"
+                - name: X_CSI_HEALTH_MONITOR_ENABLED
+                  value: "true"
+        ---
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: powerstore-config-params
+          namespace: "{{ ps_namespace }}"
+        data:
+          driver-config-params.yaml: |
+            CSI_LOG_LEVEL: "debug"
+            CSI_LOG_FORMAT: "JSON"
+      dest: "/tmp/CR.yaml"
+      mode: 0777
+
+
+  - name: Create secret in namespace "{{ ps_namespace }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/secret.yaml -n {{ ps_namespace }}"
+
+#  - name: Remove file /tmp/secret.yaml on master
+#    when: inventory_hostname in groups['k8s_master']
+#    ansible.builtin.file:
+#      path: /tmp/secret.yaml
+#      state: absent
+
+
+  - name: Deploy CRD in namespace "{{ ps_namespace }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/CR.yaml -n {{ ps_namespace }}"
+
+
+#  - name: Remove file /tmp/CR.yaml
+#    when: inventory_hostname in groups['k8s_master']
+#    ansible.builtin.file:
+#      path: /tmp/CR.yaml
+#      state: absent
+
+
+  - name: Generate powerstore-nfs storage class
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        apiVersion: storage.k8s.io/v1
+        kind: StorageClass
+        metadata:
+          name: "powerstore-nfs"
+        provisioner: "csi-powerstore.dellemc.com"
+        parameters:
+          FsType: nfs
+          arrayID: "{{ ps_id }}"
+          nasName: "{{ nas_server }}"
+          allowRoot: "true"
+        reclaimPolicy: Delete
+        allowVolumeExpansion: true
+        volumeBindingMode: Immediate
+      dest: "/tmp/SC.yaml"
+      mode: 0777
+
+  - name: Create powerstore-nfs storage class
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/SC.yaml"
+
+
+#  - name: Remove file /tmp/SC.yaml
+#    when: inventory_hostname in groups['k8s_master']
+#    ansible.builtin.file:
+#      path: /tmp/SC.yaml
+#      state: absent

@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: "powerstore-nfs"
+provisioner: "csi-powerstore.dellemc.com"
+parameters:
+  FsType: nfs
+  arrayID: "PS7097daffc409"
+  nasName: "NAS02"
+  allowRoot: "true"
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate
