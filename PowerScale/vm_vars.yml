@@ -1,0 +1,26 @@
+---
+# martin.flint@dell.com
+## Base Set of VC Variables
+vc_hostname: 'dc3strvc2.storage.local'
+validate_certs: false
+vc_username: "{{ lookup('env', 'VC_USERNAME') }}"
+vc_password: "{{ lookup('env', 'VC_PASSWORD') }}"
+rp: 'IAC Showcase'
+
+guests:
+  - host_name: 'JARVIS-1'
+    vm_template: 'JARVIS-1-TEMPLATE'
+    datastore: 'PowerScale DTW-2023'
+    datacenter: 'DC3STRLIM'
+    esxi_host: 'dc3strshow01.storage.local'
+  - host_name: 'JARVIS-2'
+    vm_template: 'JARVIS-2-TEMPLATE'
+    datastore: 'PowerScale DTW-2023'
+    datacenter: 'DC3STRLIM'
+    esxi_host: 'dc3strshow02.storage.local'
+  - host_name: 'JARVIS-3'
+    vm_template: 'JARVIS-3-TEMPLATE'
+    datastore: 'PowerScale DTW-2023'
+    datacenter: 'DC3STRLIM'
+    esxi_host: 'dc3strshow03.storage.local'
+ 
