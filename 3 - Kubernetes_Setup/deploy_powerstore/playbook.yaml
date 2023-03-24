@@ -8,8 +8,6 @@
   vars_files:
     - vars.yaml
 
-
-
   tasks:
 
   - name: Generate config.yaml for PowerStore on master

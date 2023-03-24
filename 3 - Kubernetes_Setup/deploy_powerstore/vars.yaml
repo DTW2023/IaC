@@ -1,0 +1,7 @@
+---
+ps_username: "{{ lookup('env', 'PS_USERNAME') }}"
+ps_password: "{{ lookup('env', 'PS_PASSWORD') }}"
+ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
+nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
+ps_id: "{{ lookup('env', 'PS_ID') }}"
+ps_namespace: "powerstore-csi"
