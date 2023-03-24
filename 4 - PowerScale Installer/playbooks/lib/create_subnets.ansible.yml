@@ -1,0 +1,60 @@
+- name: Create Subnet with VLAN | {{ subnet.name }}
+  dellemc.powerscale.subnet:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    subnet_name: "{{ subnet.name }}"
+    description: "{{ subnet.description }}"
+    groupnet_name: "{{ groupnet_name }}"
+    netmask: "{{ subnet.netmask }}"
+    gateway_priority: "{{ subnet.priority }}"
+    subnet_params:
+      gateway: "{{ subnet.gateway | default('0.0.0.0')}}"
+      sc_service_addrs:
+        - start_range: "{{ subnet.ssips[0] }}"
+          end_range: "{{ subnet.ssips[1] }}"
+      sc_service_addrs_state: "add"
+      mtu: 1500
+      vlan_enabled: "{{ (subnet.vlan_id is defined) | ternary(true, false) }}"
+      vlan_id: "{{ subnet.vlan_id }}"
+    state: present
+  when: subnet.vlan_id is defined and subnet.vlan_id > 0
+
+- name: Create Subnet | {{ subnet.name }}
+  dellemc.powerscale.subnet:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    subnet_name: "{{ subnet.name }}"
+    description: "{{ subnet.description }}"
+    groupnet_name: "{{ groupnet_name }}"
+    netmask: "{{ subnet.netmask }}"
+    gateway_priority: "{{ subnet.priority }}"
+    subnet_params:
+      gateway: "{{ subnet.gateway }}"
+      sc_service_addrs:
+        - start_range: "{{ subnet.ssips[0] }}"
+          end_range: "{{ subnet.ssips[1] }}"
+      sc_service_addrs_state: "add"
+      mtu: 1500
+    state: present
+  when: subnet.vlan_id is undefined or subnet.vlan_id == 0
+
+- name: Create IP Address Pools | {{ subnet.name }}
+  ansible.builtin.include_tasks: create_ip_pools.ansible.yml
+  vars:
+    pool_params:
+      groupnet_name: "{{ groupnet_name }}"
+      subnet_name: "{{ subnet.name }}"
+  loop: "{{ subnet.pools }}"
+  loop_control:
+    label: "{{ pool.name }}"
+    loop_var: pool

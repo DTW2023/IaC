@@ -1,0 +1,21 @@
+- name: Create ADS Provider
+  #   vars_prompt:
+  #     - name: ads_username
+  #       prompt: "{{ privder.domain_name }} Username"
+  #       private: no
+  #     - name: ads_password
+  #       prompt: "{{ privder.domain_name }} Password"
+  #       private: yes
+  dellemc.powerscale.dellemc_powerscale_ads:
+    onefs_host: "{{ hostname  }}"
+    port_no: "8080"
+    api_user: "{{ username }}"
+    api_password: "{{ password}}"
+    verify_ssl: False
+
+    domain_name: "{{ provider.domain_name }}"
+    instance_name: "Active Directory"
+    ads_user: "{{ ads_username }}"
+    ads_password: "{{ ads_password }}"
+    groupnet: "{{ provider.groupnet }}"
+    state: present

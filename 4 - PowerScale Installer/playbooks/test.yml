@@ -1,0 +1,23 @@
+- name: Test Cluster Communication
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - dellemc.powerscale
+
+  tasks:          
+    - name: Get Cluster Information
+      dellemc.powerscale.info:
+        ########################################################################
+        onefs_host: 127.0.0.1
+        api_user: root
+        api_password: password
+        port_no: 8080
+        verify_ssl: false
+        ########################################################################
+        gather_subset:
+          - attributes
+      register: cluster
+
+    - name: Print Debug Information
+      debug:
+        var: cluster

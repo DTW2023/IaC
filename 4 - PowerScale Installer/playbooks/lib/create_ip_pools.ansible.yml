@@ -1,0 +1,110 @@
+- name: Create IP Address Pool | {{ pool.name }}
+  dellemc.powerscale.networkpool:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    groupnet_name: "{{ pool_params.groupnet_name }}"
+    subnet_name: "{{ pool_params.subnet_name }}"
+    description: "{{ pool.description if pool.description is defined else 'SMB' if pool.alloc_method == 'static' else 'NFS' }} - {{ pool.dns_zone }}"
+    pool_name: "{{ pool.name }}"
+    access_zone: "{{ pool.access_zone }}"
+    sc_params:
+      sc_dns_zone: "{{ pool.dns_zone }}"
+      alloc_method: "{{ pool.alloc_method }}"
+    state: "present"
+
+- name: Configure Static Routes
+  ansible.builtin.uri:
+    url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/7/network/groupnets/{{ pool_params.groupnet_name }}/subnets/{{ pool_params.subnet_name }}/pools/{{ pool.name }}"
+    validate_certs: false
+    method: put
+    headers:
+      X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+      Cookie: "isisessid={{ session.cookies.isisessid }}"
+      Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+    status_code: 204
+    body_format: json
+    body: |
+      {
+        "static_routes": {{ pool.routes }}
+      }
+  when: pool.routes is defined
+
+- name: Configure Zone Aliases
+  ansible.builtin.uri:
+    url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/7/network/groupnets/{{ pool_params.groupnet_name }}/subnets/{{ pool_params.subnet_name }}/pools/{{ pool.name }}"
+    validate_certs: false
+    method: put
+    headers:
+      X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+      Cookie: "isisessid={{ session.cookies.isisessid }}"
+      Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+    status_code: 204
+    body_format: json
+    body: |
+      {
+        "sc_dns_zone_aliases": {{ pool.aliases }}
+      }
+  when: pool.aliases is defined
+
+- name: Add IP Range | {{ pool.name }}
+  dellemc.powerscale.networkpool:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    groupnet_name: "{{ pool_params.groupnet_name }}"
+    subnet_name: "{{ pool_params.subnet_name }}"
+    pool_name: "{{ pool.name }}"
+    additional_pool_params:
+      ranges:
+        - low: "{{ item.start }}"
+          high: "{{ item.end }}"
+      range_state: "add"
+    state: present
+  loop: "{{ pool.ranges }}"
+
+- name: Set Network Facts
+  ansible.builtin.set_fact:
+    interfaces: []
+
+- name: Generating Node Interfaces - Physical Platform
+  set_fact:
+    interfaces: "{{ interfaces + [{'lnn': item.lnn, 'iface': item.iface }] }}"
+  loop: "{{pool.interfaces }}"
+  when: item.lnn in nodes and is_virtual is false
+
+- name: Generating Node Interfaces - Virtual Platform
+  set_fact:
+    interfaces: "{{ interfaces + [{'lnn': item.lnn, 'iface': item.iface | regex_replace('\\d+gige-agg','ext') | regex_replace('mgmt','ext')}] }}"
+  loop: "{{pool.interfaces }}"
+  when: item.lnn in nodes and is_virtual is true
+
+- name: Add Interfaces | {{ pool.name }}
+  dellemc.powerscale.networkpool:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    groupnet_name: "{{ pool_params.groupnet_name }}"
+    subnet_name: "{{ pool_params.subnet_name }}"
+    pool_name: "{{ pool.name }}"
+    additional_pool_params:
+      ifaces: "{{ interfaces }}"
+      iface_state: "add"
+    state: present
+
+- name: Wait for Management to Stabilize
+  ansible.builtin.wait_for:
+    port: 8080
+    host: "{{ POWERSCALE_HOSTNAME }}"

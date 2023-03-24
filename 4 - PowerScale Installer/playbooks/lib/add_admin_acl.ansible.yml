@@ -1,0 +1,55 @@
+- name: Build Default ACL
+  ansible.builtin.set_fact:
+    acls:
+      administrator:
+        accessrights:
+          - dir_gen_all
+        accesstype: allow
+        inherit_flags:
+          - object_inherit
+          - container_inherit
+        trustee:
+          name: Administrators
+          type: group
+      everyone:
+        accessrights:
+          - dir_gen_read
+          - dir_gen_execute
+        accesstype: allow
+        inherit_flags: []
+        trustee:
+          id: SID:S-1-1-0
+          name: Everyone
+          type: wellknown
+
+- name: Get Existing ACL
+  ansible.builtin.uri:
+    url: "https://{{ POWERSCALE_HOSTNAME }}:8080/namespace{{ path }}?acl"
+    validate_certs: false
+    method: get
+    headers:
+      X-CSRF-Token: "{{ isicsrf }}"
+      Cookie: "isisessid={{ isisessid }}"
+      Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+      x-isi-ifs-target-type: "container"
+    status_code: 200
+  register: response
+
+- name: Merge Default ACL with Existing ACL
+  ansible.builtin.set_fact:
+    acl: "{{ (response.json.acl | difference([ acls.everyone ]) ) + [ acls.administrator] | reverse }}"
+
+- name: Update ACL on {{ path }}
+  ansible.builtin.uri:
+    url: "https://{{ POWERSCALE_HOSTNAME }}:8080/namespace{{ path }}?acl"
+    validate_certs: false
+    method: put
+    headers:
+      X-CSRF-Token: "{{ isicsrf }}"
+      Cookie: "isisessid={{ isisessid }}"
+      Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+    status_code: 200
+    body_format: json
+    body:
+      acl: "{{ acl }}"
+      authoritative: acl
