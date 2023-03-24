@@ -1,0 +1,17 @@
+- name: Provision PowerScale Cluster from Configuration File
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Read Configuration from JSON
+      ansible.builtin.include_vars:
+        file: "../configs/esxi_hosts.json"
+        name: config
+
+    - name: Debug Variables
+      ansible.builtin.debug:
+        msg: "{{ esxi_host.host_name }}"
+      loop: "{{ config.esxi_hosts }}"
+      loop_control:
+        label: "{{ esxi_host.host_name }}"
+        loop_var: esxi_host

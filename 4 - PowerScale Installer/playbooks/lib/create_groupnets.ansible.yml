@@ -1,0 +1,34 @@
+- name: Create Groupnet | {{ groupnet.name }}
+  dellemc.powerscale.groupnet:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    groupnet_name: "{{ groupnet.name }}"
+    description: "{{ groupnet.description }}"
+    dns_servers: "{{ groupnet.dns_servers | list }}"
+    dns_server_state: add
+    dns_search_suffix: "{{ groupnet.dns_search_suffix | list }}"
+    dns_search_suffix_state: add
+    state: present
+
+- name: Create Access Zones | {{ groupnet.name }}
+  ansible.builtin.include_tasks: create_access_zones.ansible.yml
+  vars:
+    groupnet_name: "{{ groupnet.name }}"
+  loop: "{{ groupnet.zones }}"
+  loop_control:
+    label: "{{ zone.name }}"
+    loop_var: zone
+
+- name: Create Subnets | {{ groupnet.name }}
+  ansible.builtin.include_tasks: create_subnets.ansible.yml
+  vars:
+    groupnet_name: "{{ groupnet.name }}"
+  loop: "{{ groupnet.subnets }}"
+  loop_control:
+    label: "{{ subnet.name }}"
+    loop_var: subnet

@@ -1,0 +1,146 @@
+# This gets a bit complex..
+#  1. Use an absolute path if defined in the configuration
+#  2. Use an alternative cluster name if defined in the configuration
+#  3. Create path using cluster name and zone name
+- name: Set Guard Rails for Access Zone Base Path
+  ansible.builtin.set_fact:
+    base_path: "/ifs/{{ cluster.Attributes.Config.name | lower }}/{{ zone.name | lower }}"
+  when: zone.path is undefined
+
+- name: Set Access Zone Base Path if defiend in configuration file
+  ansible.builtin.set_fact:
+    base_path: "{{ zone.path }}"
+  when: zone.path is defined
+
+- name: Create Access Zones | {{ zone.name }} # noqa: args[module]
+  dellemc.powerscale.accesszone:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    az_name: "{{ zone.name }}"
+    path: "{{ base_path }}"
+    create_path: true
+    groupnet: "{{ groupnet_name }}"
+    auth_providers:
+      - provider_name: "System"
+        provider_type: "file"
+    provider_state: "add"
+    state: "{{ zone.state | default('present') }}"
+
+- name: Create Access Zone Volumes | {{ zone.name }}
+  dellemc.powerscale.filesystem:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    path: "{{ item }}"
+    access_zone: "{{ zone.name }}"
+    owner:
+      name: root
+      provider_type: file
+    quota:
+      include_snap_data: false
+      include_data_protection_overhead: false
+      quota_state: present
+    state: present
+  loop: "{{ zone.volumes }}"
+  when: zone.volumes is defined
+
+- name: Create Zone Root Share
+  dellemc.powerscale.smb:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    share_name: "ifs$"
+    path: "/"
+    access_zone: "{{ zone.name }}"
+    description: "Access Zone Root Share"
+    state: present
+    permissions:
+      - group_name: "Administrators"
+        permission: "full"
+        permission_type: "allow"
+        provider_type: "local"
+  when: zone.name != 'System'
+
+- name: Create Share FileSystem Path
+  dellemc.powerscale.filesystem:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    port_no: "8080"
+    verify_ssl: false
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    ########################################################################
+    path: "{{ share.path }}"
+    access_zone: "{{ zone.name }}"
+    owner:
+      name: root
+      provider_type: file
+    state: present
+  loop: "{{ zone.shares }}"
+  loop_control:
+    label: "{{ share.name }}"
+    loop_var: share
+  when: zone.shares is defined
+
+
+- name: Create SMB Share Quota
+  dellemc.powerscale.smartquota:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    path: "{{ share.path }}"
+    quota_type: "directory"
+    access_zone: "{{ zone.name }}"
+    state: present
+    quota:
+      include_overheads: false
+      include_snapshots: false
+      hard_limit_size: "{{ share.size_gb }}"
+      cap_unit: "GB"
+  loop: "{{ zone.shares }}"
+  loop_control:
+    label: "{{ share.name }}"
+    loop_var: share
+  when: zone.shares is defined and share.size_gb is defined
+
+- name: Create SMB Shares
+  dellemc.powerscale.smb:
+    ########################################################################
+    onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+    api_user: "{{ POWERSCALE_USERNAME }}"
+    api_password: "{{ POWERSCALE_PASSWORD }}"
+    port_no: "8080"
+    verify_ssl: false
+    ########################################################################
+    share_name: "{{ share.name }}"
+    path: "{{ share.path }}"
+    access_zone: "{{ zone.name }}"
+    description: "{{ share.description }}"
+    state: present
+    permissions:
+      - group_name: "Administrators"
+        permission: "full"
+        permission_type: "allow"
+        provider_type: "local"
+  loop: "{{ zone.shares }}"
+  loop_control:
+    label: "{{ share.name }}"
+    loop_var: share
+  when: zone.shares is defined

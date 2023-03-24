@@ -1,0 +1,180 @@
+{
+    "owner": {
+        "company_name": "Dell Technologies",
+        "location": "14591 SW 120th St, Miami, FL",
+        "primary_email": "william.moore1@dell.com",
+        "primary_name": "William Moore",
+        "primary_phone1": "555-555-5555"
+    },
+    "ntp": [
+        "0.pool.ntp.org",
+        "1.pool.ntp.org",
+        "2.pool.ntp.org"
+    ],
+    "groupnets": [
+        {
+            "name": "groupnet0",
+            "description": "Default Groupnet",
+            "dns_servers": [
+                "10.204.20.2"
+            ],
+            "dns_search_suffix": [
+                "storage.local",
+                "jarvis.storage.local"
+            ],
+            "zones": [
+                {
+                    "name": "data1",
+                    "id": "data1",
+                    "volumes": [
+                        "/smb/vol1",
+                        "/smb/vol2",
+                        "/exports/vol1"
+                    ],
+                    "shares": [
+                        {
+                            "name": "admin$",
+                            "description": "SMB Administrative Share",
+                            "path": "/smb"
+                        },
+                        {
+                            "name": "ifs$",
+                            "description": "Access Zone Root Share",
+                            "path": "/"
+                        }
+                    ]
+                },
+                {
+                    "name": "data2",
+                    "id": "data2",
+                    "volumes": [
+                        "/smb/vol1",
+                        "/exports/vol1"
+                    ],
+                    "shares": [
+                        {
+                            "name": "admin$",
+                            "description": "SMB Administrative Share",
+                            "path": "/smb"
+                        },
+                        {
+                            "name": "ifs$",
+                            "description": "Access Zone Root Share",
+                            "path": "/"
+                        }
+                    ]
+                }
+            ],
+            "subnets": [
+                {
+                    "name": "subnet0",
+                    "description": "Management and Data",
+                    "netmask": "255.255.255.0",
+                    "priority": 10,
+                    "gateway": "10.204.20.1",
+                    "sc_name": "subnet0-ssip.jarvis.ad.recursivereality.io",
+                    "ssips": [
+                        "10.204.20.160",
+                        "10.204.20.160"
+                    ],
+                    "mtu": 1500,
+                    "pools": [
+                        {
+                            "name": "pool0",
+                            "description": "Management",
+                            "access_zone": "System",
+                            "dns_zone": "system.jarvis.storage.local",
+                            "alloc_method": "static",
+                            "interfaces": [
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 1
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 2
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 3
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 4
+                                }
+                            ],
+                            "ranges": [
+                                {
+                                    "start": "10.204.20.161",
+                                    "end": "10.204.20.163"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "pool1",
+                            "description": "SMB Clients",
+                            "access_zone": "data1",
+                            "dns_zone": "data1.jarvis.storage.local",
+                            "alloc_method": "static",
+                            "interfaces": [
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 1
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 2
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 3
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 4
+                                }
+                            ],
+                            "ranges": [
+                                {
+                                    "start": "10.204.20.164",
+                                    "end": "10.204.20.166"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "pool2",
+                            "description": "SMB Clients",
+                            "access_zone": "data2",
+                            "dns_zone": "data2.jarvis.storage.local",
+                            "alloc_method": "static",
+                            "interfaces": [
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 1
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 2
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 3
+                                },
+                                {
+                                    "iface": "25gige-agg-1",
+                                    "lnn": 4
+                                }
+                            ],
+                            "ranges": [
+                                {
+                                    "start": "10.204.20.167",
+                                    "end": "10.204.20.169"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

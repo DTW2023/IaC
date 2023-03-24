@@ -1,0 +1,450 @@
+- name: Provision PowerScale Cluster from Configuration File
+  hosts: localhost
+  gather_facts: false
+  vars:
+    POWERSCALE_HOSTNAME: "{{ lookup('env', 'POWERSCALE_HOSTNAME') }}"
+    POWERSCALE_USERNAME: "{{ lookup('env', 'POWERSCALE_USERNAME') }}"
+    POWERSCALE_PASSWORD: "{{ lookup('env', 'POWERSCALE_PASSWORD') }}"
+
+  tasks:
+    - name: Check Environment Varibles
+      ansible.builtin.assert:
+        that:
+          - POWERSCALE_HOSTNAME | length > 0
+          - POWERSCALE_USERNAME | length > 0
+          - POWERSCALE_PASSWORD | length > 0
+        fail_msg: "POWERSCALE_HOSTNAME, POWERSCALE_USERNAME and POWERSCALE_PASSWORD variables must be set"
+
+    - name: Initialize Network Rename Check
+      ansible.builtin.set_fact:
+        rename_networks: true
+        config_dir: "../configs"
+
+    - name: Get Cluster Information
+      dellemc.powerscale.info:
+        ########################################################################
+        onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+        api_user: "{{ POWERSCALE_USERNAME }}"
+        api_password: "{{ POWERSCALE_PASSWORD }}"
+        port_no: "8080"
+        verify_ssl: false
+        ########################################################################
+        gather_subset:
+          - attributes
+          - smb_shares
+          - network_subnets
+          - network_pools
+      register: cluster
+
+    - name: Set Cluster Hardware Facts
+      ansible.builtin.set_fact:
+        is_virtual: "{{ cluster.Attributes.Config.is_virtual }}"
+        nodes: "{{ cluster.Attributes.Config.devices | map(attribute='lnn') | list }}"
+
+    - name: Check For Configuration File
+      ansible.builtin.stat:
+        path: "{{ config_dir }}/{{ cluster.Attributes.Config.name }}.json"
+      register: configfile
+
+    - name: Read Configuration from JSON
+      include_vars:
+        file: "{{ config_dir }}/{{ cluster.Attributes.Config.name }}.json"
+        name: config
+
+    - set_fact:
+        mgmt_network: "{{ config.groupnets[0].name }}.{{config.groupnets[0].subnets[0].name}}"
+        mgmt_pool: "{{ config.groupnets[0].name }}.{{config.groupnets[0].subnets[0].name }}.{{config.groupnets[0].subnets[0].pools[0].name}}"
+
+    - set_fact:
+        rename_networks: false
+      loop: "{{ cluster.NetworkPools }}"
+      when:
+        - item.id == mgmt_pool
+
+    - name: Get API Session Token
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/session/1/session"
+        method: post
+        body_format: json
+        validate_certs: no
+        status_code: 200,201
+        body: |
+          {
+            "username": "{{ POWERSCALE_USERNAME }}",
+            "password": "{{ POWERSCALE_PASSWORD }}",
+            "services": [
+              "platform", "remote-service", "namespace"
+            ]
+          }
+      register: response
+
+    - name: Setting PAPI Session Information
+      set_fact:
+        session:
+          cookies:
+            isisessid: "{{ response.cookies.isisessid }}"
+            isicsrf: "{{ response.cookies.isicsrf }}"
+
+    - include_tasks: lib/add_admin_acl.ansible.yml
+      vars:
+        isisessid: "{{ session.cookies.isisessid }}"
+        isicsrf: "{{ session.cookies.isicsrf }}"
+      loop:
+        - /ifs
+        - /ifs/data
+      loop_control:
+        loop_var: path
+
+    - name: Use API Session Information
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/3/network/external"
+        validate_certs: no
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 204
+        body_format: json
+        body: |
+          {
+          }
+
+    - name: Configure Owner Information
+      uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/1/cluster/owner"
+        validate_certs: no
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 200
+        body_format: json
+        body: |
+          {
+            "company": "{{ config.owner.company_name }}",
+            "location": "{{ config.owner.location }}",
+            "primary_email": "{{ config.owner.primary_email }}",
+            "primary_name": "{{ config.owner.primary_name }}",
+            "primary_phone1": "{{ config.owner.primary_phone1 }}"
+          }
+
+    ############################################################################
+    # Configure SMPT Settings
+    ############################################################################
+    - name: Setting SMTP Subject
+      # Set the Default SMTP Subject if not defined in config file
+      set_fact:
+        smtp_subject: "ALERTS :: {{cluster.Attributes.Config.name | upper}}"
+
+    - name: Configure E-Mail Settings
+      dellemc.powerscale.settings:
+        ########################################################################
+        onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+        api_user: "{{ POWERSCALE_USERNAME }}"
+        api_password: "{{ POWERSCALE_PASSWORD }}"
+        port_no: "8080"
+        verify_ssl: false
+        ########################################################################
+        state: present
+        mail_relay: "{{ config.smtp.relay_host }}"
+        mail_sender: "{{ config.smtp.sender }}"
+        mail_subject: "{{ smtp_subject if config.smtp.subject is not defined else config.smtp.subject }}"
+      when: config.smtp is defined
+
+    - name: Create SMTP Alert Channel
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/11/event/channels"
+        validate_certs: no
+        method: post
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 200,201,400
+        body_format: json
+        body: |
+          {
+            "enabled": true,
+            "name": "SMTP",
+            "system": false,
+            "type": "smtp",
+            "parameters": {
+              "address": [
+                "{{ config.owner.primary_email }}"
+              ]
+            }
+          }
+
+    - name: Create Alert Conditions
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/11/event/alert-conditions"
+        validate_certs: no
+        method: post
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 200,201,400
+        body_format: json
+        body: |
+          {
+            "name": "SMTP - {{ item }}",
+            "condition": "{{ item }}",
+            "categories": [
+              "all"
+            ],
+            "channels": [
+              "SMTP"
+            ]
+          }
+      with_items:
+        - NEW
+        - RESOLVED
+        - SEVERITY INCREASE
+
+    - name: Configure NTP Settings
+      dellemc.powerscale.settings:
+        ########################################################################
+        onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+        api_user: "{{ POWERSCALE_USERNAME }}"
+        api_password: "{{ POWERSCALE_PASSWORD }}"
+        port_no: "8080"
+        verify_ssl: false
+        ########################################################################
+        ntp_servers: "{{ config.ntp | list }}"
+        state: present
+
+    - name: Configure SNMP v3
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/11/protocols/snmp/settings"
+        validate_certs: no
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 204
+        body_format: json
+        body: |
+          {
+            "service": true,
+            "snmp_v1_v2c_access": false,
+            "snmp_v3_access": true,
+            "snmp_v3_auth_protocol": "MD5",
+            "snmp_v3_priv_protocol": "AES",
+            "snmp_v3_read_only_user": "{{ config.snmp.read_only_community }}",
+            "snmp_v3_priv_password": "!Password123",
+            "snmp_v3_security_level": "authNoPriv",
+            "system_contact": "{{ config.snmp.system_contact }}",
+            "system_location": "{{ config.snmp.system_location }}"
+          }
+      when: config.snmp is defined and config.snmp.snmp_v1_v2c_access is false
+
+    - name: Configure IMPI
+      block:
+        - name: Enable IPMI Service
+          ansible.builtin.uri:
+            url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/11/ipmi/config/settings"
+            validate_certs: no
+            method: put
+            headers:
+              X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+              Cookie: "isisessid={{ session.cookies.isisessid }}"
+              Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+            status_code: 204
+            body_format: json
+            body: |
+              {
+                "enabled": true,
+                "allocation_type": "static"
+              }
+
+        - name: Configure IPMI Network
+          ansible.builtin.uri:
+            url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/11/ipmi/config/network"
+            validate_certs: no
+            method: put
+            headers:
+              X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+              Cookie: "isisessid={{ session.cookies.isisessid }}"
+              Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+            status_code: 204
+            body_format: json
+            body: |
+              {
+                "prefixlen": {{ config.ipmi.prefixlen }},
+                "gateway": "{{ config.ipmi.gateway }}",
+                "ranges": [
+                  {
+                    "low": "{{ config.ipmi.ranges.low }}",
+                    "high": "{{ config.ipmi.ranges.high }}"
+                  }
+                ]
+              }
+      when: config.ipmi is defined
+
+    - name: Enable SMB Service
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/3/protocols/smb/settings/global"
+        validate_certs: False
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 204
+        body_format: json
+        body: |
+          {
+            "service": true
+          }
+
+    - name: NFS | Configure NFS Service
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/platform/3/protocols/nfs/settings/global"
+        validate_certs: no
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 204
+        body_format: json
+        body: |
+          {
+            "service": true,
+            "nfsv3_enabled": true
+          }
+
+    - name: Rename Default Subnet And Pool -> {{ config.groupnets[0].subnets[0].pools[0].name }}
+      block:
+        - name: Rename Subnet
+          dellemc.powerscale.subnet:
+            ########################################################################
+            onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+            api_user: "{{ POWERSCALE_USERNAME }}"
+            api_password: "{{ POWERSCALE_PASSWORD }}"
+            port_no: "8080"
+            verify_ssl: false
+            ########################################################################
+            groupnet_name: "groupnet0"
+            subnet_name: "subnet0"
+            new_subnet_name: "{{ config.groupnets[0].subnets[0].name }}"
+            state: present
+
+        - name: Rename Pool
+          dellemc.powerscale.networkpool:
+            ########################################################################
+            onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+            api_user: "{{ POWERSCALE_USERNAME }}"
+            api_password: "{{ POWERSCALE_PASSWORD }}"
+            port_no: "8080"
+            verify_ssl: false
+            ########################################################################
+            groupnet_name: "groupnet0"
+            subnet_name: "{{ config.groupnets[0].subnets[0].name }}"
+            pool_name: "pool0"
+            new_pool_name: "{{ config.groupnets[0].subnets[0].pools[0].name }}"
+            state: present
+      when:
+        - rename_networks == true
+
+    - name: Delete Default Network Provisioning Rule
+      dellemc.powerscale.networkrule:
+        ########################################################################
+        onefs_host: "{{ POWERSCALE_HOSTNAME }}"
+        api_user: "{{ POWERSCALE_USERNAME }}"
+        api_password: "{{ POWERSCALE_PASSWORD }}"
+        port_no: "8080"
+        verify_ssl: false
+        ########################################################################
+        groupnet_name: "{{ config.groupnets[0].name }}"
+        subnet_name: "{{ config.groupnets[0].subnets[0].name}}"
+        pool_name: "{{ config.groupnets[0].subnets[0].pools[0].name }}"
+        rule_name: "rule0"
+        state: absent
+
+    - include_tasks: lib/create_groupnets.ansible.yml
+      loop: "{{ config.groupnets }}"
+      loop_control:
+        label: "{{ groupnet.name }}"
+        loop_var: groupnet
+
+    - name: Configure Remote Support
+      ansible.builtin.uri:
+        url: "https://{{ POWERSCALE_HOSTNAME }}:8080/remote-service/11/esrs/settings"
+        validate_certs: false
+        method: put
+        headers:
+          X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+          Cookie: "isisessid={{ session.cookies.isisessid }}"
+          Referer: "https://{{ POWERSCALE_HOSTNAME }}:8080"
+        status_code: 204
+        body_format: json
+        body: |
+          {
+            "primary_esrs_gateway": "{{ config.esrs.primary_gateway }}",
+            "gateway_access_pools": ["{{ config.esrs.access_pools  }}"]
+          }
+      when: config.esrs is defined
+
+# - name: Enable Remote Support
+#   ansible.builtin.uri:
+#     url: "https://{{ hostname }}:8080/remote-service/11/esrs/status"
+#     validate_certs: no
+#     method: put
+#     headers:
+#       X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+#       Cookie: "isisessid={{ session.cookies.isisessid }}"
+#       Referer: "https://{{ hostname }}:8080"
+#     status_code: 200
+#     body_format: json
+#     body: |
+#       {
+#         "enabled": true
+#       }
+
+# - name: Enable RemoteSupport Alert Channel
+#   ansible.builtin.uri:
+#     url: "https://{{ hostname }}:8080/platform/11/event/channels/RemoteSupport"
+#     validate_certs: no
+#     method: put
+#     headers:
+#       X-CSRF-Token: "{{ session.cookies.isicsrf }}"
+#       Cookie: "isisessid={{ session.cookies.isisessid }}"
+#       Referer: "https://{{ hostname }}:8080"
+#     status_code: 200,201
+#     body_format: json
+#     body: |
+#       {
+#         "enabled": true
+#       }
+
+- hosts: localhost
+  gather_facts: False
+  vars:
+    POWERSCALE_HOSTNAME: "{{ lookup('env', 'POWERSCALE_HOSTNAME') }}"
+  tasks:
+    - name: Add Host
+      add_host:
+        name: "{{ POWERSCALE_HOSTNAME }}"
+        groups: powerscale
+
+- name: Copy Logfile Crontab
+  hosts: powerscale
+  gather_facts: false
+  vars:
+    POWERSCALE_HOSTNAME: "{{ lookup('env', 'POWERSCALE_HOSTNAME') }}"
+    POWERSCALE_USERNAME: "{{ lookup('env', 'POWERSCALE_USERNAME') }}"
+    POWERSCALE_PASSWORD: "{{ lookup('env', 'POWERSCALE_PASSWORD') }}"
+    ansible_user: "{{ POWERSCALE_USERNAME }}"
+    ansible_password: "{{ POWERSCALE_PASSWORD }}"
+    ansible_become_password: "{{ POWERSCALE_PASSWORD }}"
+  tasks:
+    - name: Create Crontab
+      ansible.builtin.copy:
+        src: ../artifacts/crontab.local
+        dest: /etc/local/crontab.local
+        mode: "0644"
