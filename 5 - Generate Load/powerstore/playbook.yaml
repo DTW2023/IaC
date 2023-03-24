@@ -13,6 +13,7 @@
     - ps_id: "{{ lookup('env', 'PS_ID') }}"
     - fio_namespace: "fio-powerstore"
     - storage_class: "powerstore-nfs"
+    - replica_count: "5"
 
   tasks:
 
@@ -73,7 +74,7 @@
           name: fio
         spec:
           serviceName: fio
-          replicas: 3
+          replicas: {{ replica_count }}
           selector:
             matchLabels:
               app: fio
