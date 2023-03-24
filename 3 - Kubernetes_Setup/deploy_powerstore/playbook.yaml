@@ -6,13 +6,12 @@
   become: true
 
   vars:
-    - ps_username: "{{ lookup('env', 'VC_PS_USERNAME') }}"
+    - ps_username: "{{ lookup('env', 'PS_USERNAME') }}"
     - ps_password: "{{ lookup('env', 'PS_PASSWORD') }}"
     - ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
     - nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
     - ps_id: "{{ lookup('env', 'PS_ID') }}"
-    - ps_namespace: test-powerstore
-
+    - ps_namespace: "powerstore-csi"
 
   tasks:
 
@@ -21,15 +20,15 @@
     copy:
       content: |
         arrays:
-        - endpoint: "https://{{ ps_hostname }}/api/rest"  # full URL path to the PowerStore API
-          globalID: "{{ ps_id }}"                         # unique id of the PowerStore array
-          username: "{{ ps_username }}"                   # username for connecting to API
-          password: "{{ ps_password }}"                   # password for connecting to API
-          skipCertificateValidation: true                 # indicates if client side validation of (management)server's certificate can be skipped
-          isDefault: true                                 # treat current array as a default (would be used by storage classes without arrayID parameter)
-          blockProtocol: "auto"                           # what SCSI transport protocol use on node side (FC, ISCSI, NVMeTCP, NVMeFC, None, or auto)
-          nasName: "{{ nas_server }}"                     # what NAS should be used for NFS volumes
-          nfsAcls: "0777"                                 # (Optional) defines permissions - POSIX mode bits or NFSv4 ACLs, to be set on NFS target mount directory.
+          - endpoint: "https://{{ ps_hostname }}/api/rest"  # full URL path to the PowerStore API
+            globalID: "{{ ps_id }}"                         # unique id of the PowerStore array
+            username: "{{ ps_username }}"                   # username for connecting to API
+            password: "{{ ps_password }}"                   # password for connecting to API
+            skipCertificateValidation: true                 # indicates if client side validation of (management)server's certificate can be skipped
+            isDefault: true                                 # treat current array as a default (would be used by storage classes without arrayID parameter)
+            blockProtocol: "auto"                           # what SCSI transport protocol use on node side (FC, ISCSI, NVMeTCP, NVMeFC, None, or auto)
+            nasName: "{{ nas_server }}"                     # what NAS should be used for NFS volumes
+            nfsAcls: "0777"                                 # (Optional) defines permissions - POSIX mode bits or NFSv4 ACLs, to be set on NFS target mount directory.
       dest: "/tmp/config.yaml"
       mode: 0777
 
@@ -63,11 +62,11 @@
       mode: 0777
 
 
-#  - name: Remove file /tmp/config.yaml
-#    when: inventory_hostname in groups['k8s_master']
-#    ansible.builtin.file:
-#      path: /tmp/config.yaml
-#      state: absent
+  - name: Remove file /tmp/config.yaml
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/config.yaml
+      state: absent
 
   - name: Generate Custom Resource Definition in namespace "{{ ps_namespace }}"
     when: inventory_hostname in groups['k8s_master']
@@ -130,11 +129,11 @@
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create -f /tmp/secret.yaml -n {{ ps_namespace }}"
 
-#  - name: Remove file /tmp/secret.yaml on master
-#    when: inventory_hostname in groups['k8s_master']
-#    ansible.builtin.file:
-#      path: /tmp/secret.yaml
-#      state: absent
+  - name: Remove file /tmp/secret.yaml on master
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/secret.yaml
+      state: absent
 
 
   - name: Deploy CRD in namespace "{{ ps_namespace }}" on master
@@ -142,11 +141,11 @@
     command: "kubectl create -f /tmp/CR.yaml -n {{ ps_namespace }}"
 
 
-#  - name: Remove file /tmp/CR.yaml
-#    when: inventory_hostname in groups['k8s_master']
-#    ansible.builtin.file:
-#      path: /tmp/CR.yaml
-#      state: absent
+  - name: Remove file /tmp/CR.yaml
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/CR.yaml
+      state: absent
 
 
   - name: Generate powerstore-nfs storage class
@@ -174,8 +173,8 @@
     command: "kubectl create -f /tmp/SC.yaml"
 
 
-#  - name: Remove file /tmp/SC.yaml
-#    when: inventory_hostname in groups['k8s_master']
-#    ansible.builtin.file:
-#      path: /tmp/SC.yaml
-#      state: absent
+  - name: Remove file /tmp/SC.yaml
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/SC.yaml
+      state: absent
