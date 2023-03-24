@@ -23,7 +23,7 @@
         esxi_hostname: "{{ item.esxi_host }}"
         folder: 'vm'
         datastore: "{{ item.datastore }}"
-        state: poweredoff
+        state: poweredon
       loop: "{{ guests }}"
       loop_control:
         pause: 2
