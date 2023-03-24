@@ -151,6 +151,7 @@
         mail_relay: "{{ config.smtp.relay_host }}"
         mail_sender: "{{ config.smtp.sender }}"
         mail_subject: "{{ smtp_subject if config.smtp.subject is not defined else config.smtp.subject }}"
+      when: config.smtp is defined
 
     - name: Create SMTP Alert Channel
       ansible.builtin.uri:
