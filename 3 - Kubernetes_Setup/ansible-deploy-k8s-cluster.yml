@@ -231,7 +231,3 @@
   - name: Deploy Prometheus Operator
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  
-
-  - name: Installing Helm
-    when: inventory_hostname in groups['k8s_master']
-    command: 'curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash'
