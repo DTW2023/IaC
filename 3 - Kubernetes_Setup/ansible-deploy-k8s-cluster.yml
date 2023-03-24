@@ -232,21 +232,6 @@
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  
 
-  - name: Getting Helm
-    when: inventory_hostname in groups['k8s_master']
-    get_url: 
-     url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 
-     dest: /tmp/helm.sh
-     mode: 0755 
-     owner: root
-     group: root
-
   - name: Installing Helm
     when: inventory_hostname in groups['k8s_master']
-    command: /tmp/helm.sh
-
-  - name: Remove Helm Script
-    when: inventory_hostname in groups['k8s_master']
-    ansible.builtin.file:
-      path:  /tmp/helm.sh
-      state: absent
+    command: 'curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash'
