@@ -22,5 +22,5 @@ guests:
     vm_template: 'JARVIS-3-TEMPLATE'
     datastore: 'PowerScale DTW-2023'
     datacenter: 'DC3STRLIM'
-    esxi_host: 'dc3strshow03.storage.local'
+    esxi_host: 'dc3strshow04.storage.local'
  
