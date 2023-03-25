@@ -116,9 +116,9 @@
       path: /tmp/fio-powerstore.yaml
       state: absent
 
-  - name: you can scale up or down the set on the master by runnuing the command 'kubectl scale --replicas=X statefulset.apps/fio -n {{ fio_namespace }}'
+  - name: you can scale up or down the set on the master by running the command 'kubectl scale --replicas=X statefulset.apps/fio -n {{ fio_namespace }}'
     when: inventory_hostname in groups['k8s_master']
     debug:
-      msg: you can scale up or down the set on the master by runnuing the command 'kubectl scale --replicas=X statefulset.apps/fio -n {{ fio_namespace }}'
+      msg: you can scale up or down the set on the master by running the command 'kubectl scale --replicas=X statefulset.apps/fio -n {{ fio_namespace }}'
     delegate_to: localhost
     
