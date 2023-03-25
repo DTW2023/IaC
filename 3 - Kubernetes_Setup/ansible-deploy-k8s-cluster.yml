@@ -226,7 +226,6 @@
 
   - name: Download Helm
     when: inventory_hostname in groups['k8s_master']
-    shell: "curl /tmp/get_helm.sh  | bash"
     get_url:
       url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 
       dest: /tmp/helm.sh
