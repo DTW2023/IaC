@@ -1,4 +1,6 @@
-kubectl create namespace karavi
+#!/bin/sh
+
+#kubectl create namespace karavi
 kubectl create namespace powerstore-csm
 kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
 curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3

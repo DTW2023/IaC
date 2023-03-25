@@ -223,11 +223,19 @@
   - name: Deploy nginx Ingress Controller
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml"
-      
-  - name: Deploy Grafana Operator
+
+  - name: Install Helm
     when: inventory_hostname in groups['k8s_master']
-    command: "kubectl create -f https://operatorhub.io/install/grafana-operator.yaml"
-      
-  - name: Deploy Prometheus Operator
-    when: inventory_hostname in groups['k8s_master']
-    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  
+    shell: "curl /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+
+
+
+
+
+#  - name: Deploy Grafana Operator
+#    when: inventory_hostname in groups['k8s_master']
+#    command: "kubectl create -f https://operatorhub.io/install/grafana-operator.yaml"
+#      
+#  - name: Deploy Prometheus Operator
+#    when: inventory_hostname in groups['k8s_master']
+#    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  
