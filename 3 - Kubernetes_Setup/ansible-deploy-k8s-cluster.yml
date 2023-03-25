@@ -233,17 +233,17 @@
       group: root
       mode: 0600
 
-  - name: Download Helm 3.11.2 zip file
+  - name: Download Helm zip file
     when: inventory_hostname in groups['k8s_master']
     get_url:
-      url: https://get.helm.sh/helm-v3.11.2-linux-arm64.tar.gz
+      url: https://get.helm.sh/helm-v3.11.2-linux-amd64.tar.gz
       dest: /tmp/helm.tgz
 
   - name: Extract Helm from zip file
     when: inventory_hostname in groups['k8s_master']
-    command: "tar zxf /tmp/helm.tgz"
+    shell: "cd /tmp; tar zxf /tmp/helm.tgz"
 
-  - name: copy helm to /usr/local/bin and set permissions
+  - name: copy helm to /usr/local/bin
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.copy:
       src: /tmp/linux-amd64/helm
@@ -255,14 +255,15 @@
   - name: Delete helm Installer
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.file:
-      path: /tmp/linux-amd64
       state: absent
+      path: /tmp/linux-amd64
 
   - name: Delete helm zip file
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.file:
       path: /tmp/helm.tgz
       state: absent
+
 
 #  - name: Deploy Grafana Operator
 #    when: inventory_hostname in groups['k8s_master']
