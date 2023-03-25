@@ -224,13 +224,22 @@
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml"
 
-  - name: Install Helm
+  - name: Download Helm
     when: inventory_hostname in groups['k8s_master']
-    shell: "curl /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+    shell: "curl /tmp/get_helm.sh  | bash"
+    get_url:
+      url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 
+      dest: /tmp/helm.sh
 
+  - name: Intall Helm
+    when: inventory_hostname in groups['k8s_master']
+    shell: "sh /tmp/helm.sh"
 
-
-
+  - name: Remove Helm Installer
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: "/tmp/helm.sh"
+      state: absent
 
 #  - name: Deploy Grafana Operator
 #    when: inventory_hostname in groups['k8s_master']
