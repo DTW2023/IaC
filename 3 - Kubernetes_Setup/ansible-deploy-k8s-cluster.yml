@@ -223,7 +223,6 @@
   - name: Deploy nginx Ingress Controller
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml"
-
  
   - name: set permissions on /root/.kube/config
     when: inventory_hostname in groups['k8s_master']
@@ -247,6 +246,7 @@
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.copy:
       src: /tmp/linux-amd64/helm
+      remote_src: yes
       dest: /usr/local/bin/helm
       owner: root
       group: root
@@ -264,11 +264,10 @@
       path: /tmp/helm.tgz
       state: absent
 
-
 #  - name: Deploy Grafana Operator
 #    when: inventory_hostname in groups['k8s_master']
 #    command: "kubectl create -f https://operatorhub.io/install/grafana-operator.yaml"
-#      
+#
 #  - name: Deploy Prometheus Operator
 #    when: inventory_hostname in groups['k8s_master']
-#    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"  
+#    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"
