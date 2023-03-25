@@ -224,20 +224,44 @@
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml"
 
-  - name: Download Helm
-    when: inventory_hostname in groups['k8s_master']
-    get_url:
-      url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 
-      dest: /tmp/helm.sh
-
-  - name: Intall Helm
-    when: inventory_hostname in groups['k8s_master']
-    shell: "sh /tmp/helm.sh"
-
-  - name: Remove Helm Installer
+ 
+  - name: set permissions on /root/.kube/config
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.file:
-      path: "/tmp/helm.sh"
+      path: /root/.kube/config
+      owner: root
+      group: root
+      mode: 0600
+
+  - name: Download Helm 3.11.2 zip file
+    when: inventory_hostname in groups['k8s_master']
+    get_url:
+      url: https://get.helm.sh/helm-v3.11.2-linux-arm64.tar.gz
+      dest: /tmp/helm.tgz
+
+  - name: Extract Helm from zip file
+    when: inventory_hostname in groups['k8s_master']
+    command: "tar zxf /tmp/helm.tgz"
+
+  - name: copy helm to /usr/local/bin and set permissions
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.copy:
+      src: /tmp/linux-amd64/helm
+      dest: /usr/local/bin/helm
+      owner: root
+      group: root
+      mode: 755
+
+  - name: Delete helm Installer
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/linux-amd64
+      state: absent
+
+  - name: Delete helm zip file
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/helm.tgz
       state: absent
 
 #  - name: Deploy Grafana Operator
