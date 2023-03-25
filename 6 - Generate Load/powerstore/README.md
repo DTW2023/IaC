@@ -5,4 +5,4 @@ replica_count to set number of replicas to run
 
 run command
 
-ansiple-playbook -i inv playbook.yaml
+ansiple-playbook -i inventory playbook.yaml
