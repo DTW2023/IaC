@@ -1,0 +1,41 @@
+kubectl create namespace karavi
+kubectl create namespace powerstore-csm
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
+curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+sh /tmp/get_helm.sh
+helm repo add dell https://dell.github.io/helm-charts
+kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: powerstore-csm/' | kubectl create -f -
+helm install karavi-observability dell/karavi-observability -n powerstore-csm -f values.yaml
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
+
+
+helm install prometheus prometheus-community/prometheus -n powerstore-csm -f prometheus-values.yaml
+
+
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+helm install grafana grafana/grafana -n powerstore-csm -f grafana-values.yaml
+
+POD_NAME=`kubectl get pod -n powerstore-csm --no-headers | grep "^grafana-" | awk '{ print $1 }'`
+
+RUNNING_ON=`kubectl get pod $POD_NAME -n powerstore-csm -o wide --no-headers | awk '{ print $7 }'`
+PORT=`kubectl get svc -n powerstore-csm | grep "^grafana" | awk '{ print $5 }' | awk -F":" '{ print $2 }' | awk -F"/" '{ print $1 }'`
+
+
+echo go to http://${RUNNING_ON}:${PORT}/login - login is admin, password is admin
+
+echo have to manually add bits here!!!!!!
+
+import these!!!!
+
+
+#copy and paste these into json panel...
+#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/volume_io_metrics.json
+#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/filesystem_io_metrics.json
+#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/storage_consumption.json
+#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/topology/topology.json
+
