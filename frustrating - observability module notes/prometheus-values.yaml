@@ -22,7 +22,7 @@ server:
     type: NodePort
     servicePort: 9090
 extraScrapeConfigs: |
-  - job_name: 'karavi-metrics-dell-csm-observability'
+  - job_name: 'karavi-metrics-[CSI-DRIVER]'
     scrape_interval: 5s
     scheme: https
     static_configs:
