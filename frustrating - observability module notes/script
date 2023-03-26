@@ -47,13 +47,4 @@ grafana_ip=`kubectl get pods -n dell-observability-csm -o wide | grep ^grafana |
 echo grafana server is at http://${grafana_ip}:${grafana_port} use you brower and login default is admin/admin as per the grafana-values.yaml 
 echo ""
 echo Now, follow the steps from this section of the Dell CSM Observability Installation in DETAIL video at https://youtu.be/KY3NjHmGX-8?t=544
-echo once configured install approprita dashboards which you can get form here https://dell.github.io/csm-docs/docs/observability/deployment/#importing-csm-for-observability-dashboards
-
-
-# Go to 
-#copy and paste these into json panel...
-#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/volume_io_metrics.json
-#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/filesystem_io_metrics.json
-#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/storage_consumption.json
-#https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/topology/topology.json
-
+echo once configured install the approprite dashboards which you can get form here https://dell.github.io/csm-docs/docs/observability/deployment/#importing-csm-for-observability-dashboards
