@@ -100,7 +100,7 @@
               - ReadWriteOnce
               resources:
                 requests:
-                  storage: 4Ti
+                  storage: 50Gi
       dest: "/tmp/fio-powerstore.yaml"
       mode: 0777
 
