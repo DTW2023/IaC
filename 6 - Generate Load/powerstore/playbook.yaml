@@ -33,22 +33,22 @@
         data:
           fio.job: |-
             [global]
-            ioengine=psync
+            [global]
+            ioengine=libaio
+            filesize=100g
             direct=1
-            buffered=0
-            size=1G
-            iodepth=100
-            numjobs=10
             group_reporting
-            refill_buffers
-            rwmixread=80
+            runtime=1440m
+            time_based
+            invalidate=1
             norandommap
             randrepeat=0
-            percentage_random=0
-            bs=512K
-            buffer_compress_percentage=50
-            rw=read
             [testjob]
+            rw=randrw
+            rwmixread=80
+            numjobs=25
+            bs=4k
+            iodepth=3
       dest: "/tmp/config.yaml"
       mode: 0777
 
