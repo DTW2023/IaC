@@ -32,8 +32,8 @@
             direct=1
             buffered=0
             size=10G
-            iodepth=1000
-            numjobs=100
+            iodepth=100
+            numjobs=10
             group_reporting
             refill_buffers
             rwmixread=80
@@ -122,7 +122,7 @@
     copy:
       content: |
         #!/bin/sh 
-        for i in `seq 2 8`
+        for i in `seq 2 10`
         do 
           for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }'`
           do
