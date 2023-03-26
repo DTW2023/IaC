@@ -6,13 +6,8 @@
   become: true
 
   vars:
-    - ps_username: "{{ lookup('env', 'PS_USERNAME') }}"
-    - ps_password: "{{ lookup('env', 'PS_PASSWORD') }}"
-    - ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
-    - nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
-    - ps_id: "{{ lookup('env', 'PS_ID') }}"
-    - fio_namespace: "fio-powerstore"
-    - storage_class: "powerstore-nfs"
+    - fio_namespace: "fio-powerscale"
+    - storage_class: "powerscale"
     - replica_count: "1"
 
   tasks:
@@ -120,6 +115,7 @@
     ansible.builtin.file:
       path: /tmp/fio-powerstore.yaml
       state: absent
+
 
   - name: Create file /root/fio-scaleup.sh on master
     when: inventory_hostname in groups['k8s_master']
