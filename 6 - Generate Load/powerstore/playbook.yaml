@@ -44,11 +44,10 @@
             norandommap
             randrepeat=0
             [testjob]
-            rw=randrw
             rwmixread=80
-            numjobs=25
+            numjobs=50
             bs=4k
-            iodepth=3
+            iodepth=10
       dest: "/tmp/config.yaml"
       mode: 0777
 
