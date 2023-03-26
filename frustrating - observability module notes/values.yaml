@@ -2,8 +2,7 @@ karaviTopology:
   image: dellemc/csm-topology:v1.4.0
   enabled: true
   # comma separated list of provisioner names (ex: csi-vxflexos.dellemc.com)
-  provisionerNames: csi-powerstore.dellemc.com
-  #provisionerNames: csi-vxflexos.dellemc.com,csi-powerstore.dellemc.com,csi-isilon.dellemc.com
+  provisionerNames: csi-vxflexos.dellemc.com,csi-powerstore.dellemc.com,csi-isilon.dellemc.com
   service:
     type: ClusterIP
   logLevel: INFO
@@ -12,6 +11,46 @@ karaviTopology:
     uri: ""
     serviceName: karavi-topology
     probability: 0.0
+
+karaviMetricsPowerflex:
+  image: dellemc/csm-metrics-powerflex:v1.4.0
+  enabled: false
+  collectorAddr: otel-collector:55680
+  # comma separated list of provisioner names (ex: csi-vxflexos.dellemc.com)
+  provisionerNames: csi-vxflexos.dellemc.com
+  # set sdcMetricsEnabled to "false" to disable collection of SDC metrics
+  sdcMetricsEnabled: "true"
+  # set polling frequency to the PowerFlex array to get metrics data
+  sdcPollFrequencySeconds: 10
+  volumePollFrequencySeconds: 10
+  # set volumeMetricsEnabled to "false" to disable collection of Volume metrics
+  volumeMetricsEnabled: "true"
+  # set storageClassPoolMetricsEnabled to "false" to disable collection of storage class/pool metrics
+  storageClassPoolMetricsEnabled: "true"
+  # set the polling frequency to configure the interval which storage class/pool metrics are gathered
+  storageClassPoolPollFrequencySeconds: 10
+  # set the the default max concurrent queries to PowerFlex
+  concurrentPowerflexQueries: 10
+  # set the default endpoint for PowerFlex service
+  endpoint: karavi-metrics-powerflex
+  service:
+    type: ClusterIP
+  logLevel: INFO
+  logFormat: text
+  authorization:
+    enabled: false
+    # sidecarProxyImage: the container image used for the csm-authorization-sidecar.
+    # Default value: dellemc/csm-authorization-sidecar:v1.5.0
+    sidecarProxyImage: dellemc/csm-authorization-sidecar:v1.5.0
+    # proxyHost: hostname of the csm-authorization server
+    # Default value: None
+    proxyHost:
+    # skipCertificateValidation: certificate validation of the csm-authorization server
+    # Allowed Values:
+    #   "true" - TLS certificate verification will be skipped
+    #   "false" - TLS certificate will be verified
+    # Default value: "true"
+    skipCertificateValidation: true
 
 karaviMetricsPowerstore:
   image: dellemc/csm-metrics-powerstore:v1.4.0
@@ -38,6 +77,56 @@ karaviMetricsPowerstore:
     uri: ""
     serviceName: metrics-powerstore
     probability: 0.0
+
+karaviMetricsPowerscale:
+  image: dellemc/csm-metrics-powerscale:v1.1.0
+  enabled: true
+  collectorAddr: otel-collector:55680
+  # comma separated list of provisioner names (ex: csi-isilon.dellemc.com)
+  provisionerNames: csi-isilon.dellemc.com
+  # set capacityMetricsEnabled to "false" to disable collection of capacity metrics
+  capacityMetricsEnabled: "true"
+  # set performanceMetricsEnabled to "false" to disable collection of performance metrics
+  performanceMetricsEnabled: "true"
+  # set polling frequency to get cluster capacity metrics data
+  clusterCapacityPollFrequencySeconds: 30
+  # set polling frequency to get cluster performance data
+  clusterPerformancePollFrequencySeconds: 20
+  # set polling frequency to get quota capacity metrics data
+  quotaCapacityPollFrequencySeconds: 30
+  # set the the default max concurrent queries to PowerScale
+  concurrentPowerscaleQueries: 10
+  # set the default endpoint for PowerScale service
+  endpoint: karavi-metrics-powerscale
+  service:
+    type: ClusterIP
+  logLevel: INFO
+  logFormat: text
+  # isiClientOptions to access Powerscale OneFS API server
+  isiClientOptions:
+    # set isiSkipCertificateValidation to true/false to skip/verify OneFS API server's certificates
+    # default isiSkipCertificateValidation: true to skip OneFS API server's certificates
+    isiSkipCertificateValidation: true
+    # set isiAuthType to 0/1 to enables session-based/basic Authentication
+    # default isiAuthType: 0 to use session-based Authentication
+    isiAuthType: 1
+    # set isiLogVerbose to 0/1/2 decide High/Medium/Low content of the OneFS REST API message should be logged in debug level logs
+    # default isiLogVerbose: 0 to log full content of the HTTP request and response
+    isiLogVerbose: 0
+  authorization:
+    enabled: false
+    # sidecarProxyImage: the container image used for the csm-authorization-sidecar.
+    # Default value: dellemc/csm-authorization-sidecar:v1.5.0
+    sidecarProxyImage: dellemc/csm-authorization-sidecar:v1.5.0
+    # proxyHost: hostname of the csm-authorization server
+    # Default value: None
+    proxyHost:
+    # skipCertificateValidation: certificate validation of the csm-authorization server
+    # Allowed Values:
+    #   "true" - TLS certificate verification will be skipped
+    #   "false" - TLS certificate will be verified
+    # Default value: "true"
+    skipCertificateValidation: true
 
 otelCollector:
   image: otel/opentelemetry-collector:0.42.0

@@ -19,10 +19,10 @@ server:
   persistentVolume:
     enabled: false
   service:
-    type: LoadBalancer
-    loadBalancerIP: 10.204.20.174
+    type: NodePort
+    servicePort: 9090
 extraScrapeConfigs: |
-  - job_name: 'karavi-metrics-powerstore'
+  - job_name: 'karavi-metrics-dell-csm-observability'
     scrape_interval: 5s
     scheme: https
     static_configs:

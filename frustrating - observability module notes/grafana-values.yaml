@@ -5,8 +5,7 @@ image:
   sha: ""
   pullPolicy: IfNotPresent
 service:
-  type: LoadBalancer
-  loadBalancerIP: 10.204.20.175
+  type: NodePort
 
 ## Administrator credentials when not using an existing Secret
 adminUser: admin
