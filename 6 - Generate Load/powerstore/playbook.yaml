@@ -125,14 +125,14 @@
     copy:
       content: |
         #!/bin/sh 
-        for i in `seq 2 10`
+        for i in `seq 2 20`
         do 
           for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }'`
           do
             echo setting replicas to $i for namespace $NS
             kubectl scale --replicas=$i statefulset.apps/fio -n $NS
           done
-          sleep 90
+          sleep 30
         done
       dest: "/root/fio-scaleup.sh"
       mode: 0755
