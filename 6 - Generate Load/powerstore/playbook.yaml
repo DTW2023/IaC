@@ -131,7 +131,7 @@
           for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }'`
           do
             echo setting replicas to $i for namespace $NS
-            kubectl scale --replicas=$i deployment.apps/fio -n $NS
+            kubectl scale --replicas=$i statefulset.apps/fio -n $NS
           done
           sleep 30
         done
