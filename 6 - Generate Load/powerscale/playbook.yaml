@@ -29,7 +29,7 @@
           fio.job: |-
             [global]
             ioengine=libaio
-            filesize=100g
+            filesize=1g
             direct=1
             group_reporting
             runtime=1440m
