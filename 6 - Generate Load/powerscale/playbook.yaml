@@ -31,7 +31,7 @@
             ioengine=psync
             direct=1
             buffered=0
-            size=10G
+            size=1G
             iodepth=100
             numjobs=10
             group_reporting
