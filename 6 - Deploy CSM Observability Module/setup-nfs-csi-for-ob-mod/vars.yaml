@@ -1,0 +1,4 @@
+---
+nfs_server_ip: 10.204.20.154
+nfs_dir: /export/nfs
+storage_class_name: nfs-csi

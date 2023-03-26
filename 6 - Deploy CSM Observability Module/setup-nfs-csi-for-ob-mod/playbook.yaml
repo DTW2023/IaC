@@ -1,0 +1,51 @@
+---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
+# martin.flint@dell.com
+
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yaml
+
+  tasks:
+
+  - name: Install NFS CSI driver
+    when: inventory_hostname in groups['k8s_master']
+    #shell: "curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.1.0/deploy/install-driver.sh | bash -s v4.1.0 --"
+    shell: "curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.2.0/deploy/install-driver.sh | bash -s v4.2.0 --"
+
+  - name: Create NFS storage class called {{ storage_class_name }}
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        #Setup nfs-csi Storage Class
+        apiVersion: storage.k8s.io/v1
+        kind: StorageClass
+        metadata:
+          name: {{ storage_class_name }}
+        provisioner: nfs.csi.k8s.io
+        parameters:
+          server: {{ nfs_server_ip }}
+          share: {{ nfs_dir }}
+          # csi.storage.k8s.io/provisioner-secret is only needed for providing mountOptions in DeleteVolume
+          # csi.storage.k8s.io/provisioner-secret-name: "mount-options"
+          # csi.storage.k8s.io/provisioner-secret-namespace: "default"
+        reclaimPolicy: Delete
+        volumeBindingMode: Immediate
+        mountOptions:
+          - hard
+          - nfsvers=4.1
+      dest: "/tmp/SC.yaml"
+      mode: 0777
+
+  - name: Create storageclass "{{ storage_class_name }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/SC.yaml"
+
+
+  - name: Remove file /tmp/SC.yaml
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.file:
+      path: /tmp/SC.yaml
+      state: absent
