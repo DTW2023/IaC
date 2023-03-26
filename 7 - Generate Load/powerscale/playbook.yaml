@@ -8,7 +8,7 @@
   vars:
     - fio_namespace: "fio-powerscale"
     - storage_class: "powerscale"
-    - replica_count: "5"
+    - replica_count: "1"
 
   tasks:
 
@@ -115,6 +115,25 @@
     ansible.builtin.file:
       path: /tmp/fio-powerstore.yaml
       state: absent
+
+
+  - name: Create file /root/fio-scaleup.sh on master
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        #!/bin/sh 
+        for i in `seq 20`
+        do 
+          for NS in `kubectl get ns | grep "^fio-"`
+          do
+            echo setting replicas to $i for namespace $NS
+            kubectl scale --replicas=$i deployment.apps/fio -n $NS
+          done
+          sleep 30
+        done
+      dest: "/root/fio-scaleup.sh"
+      mode: 0755
+
 
   - name: you can scale up or down the set on the master by running the command 'kubectl scale --replicas=X statefulset.apps/fio -n {{ fio_namespace }}'
     when: inventory_hostname in groups['k8s_master']
