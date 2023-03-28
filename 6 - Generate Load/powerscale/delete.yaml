@@ -1,0 +1,18 @@
+---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
+# martin.flint@dell.com
+
+- hosts: all
+  become: true
+
+  vars:
+    - fio_namespace: "fio-powerscale"
+    - storage_class: "powerscale"
+    - replica_count: "1"
+
+  tasks:
+
+
+  - name: Create namespace "{{ fio_namespace }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl delete reate ns {{ fio_namespace }}"

@@ -1,0 +1,23 @@
+---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
+# martin.flint@dell.com
+
+- hosts: all
+  become: true
+
+  vars:
+    - ps_username: "{{ lookup('env', 'PS_USERNAME') }}"
+    - ps_password: "{{ lookup('env', 'PS_PASSWORD') }}"
+    - ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
+    - nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
+    - ps_id: "{{ lookup('env', 'PS_ID') }}"
+    - fio_namespace: "fio-powerstore"
+    - storage_class: "powerstore-nfs"
+    - replica_count: "1"
+
+  tasks:
+
+
+  - name: delete namespace "{{ fio_namespace }}" on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl delete ns {{ fio_namespace }}"

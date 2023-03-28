@@ -5,6 +5,17 @@ echo -n "Started "
 date
 start=`date +%s`
 
+echo delete fio workloads
+cd "6 - Generate Load"
+cd powerstore
+echo powerstore
+ansible-playbook -i inventory delete.yaml
+cd ..
+echo powerscale
+cd powerscale
+ansible-playbook -i inventory delete.yaml
+cd ..
+
 
 echo "Delete Virtual Machines"
 cd "2 - Virtual-Machines"
