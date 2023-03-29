@@ -14,7 +14,7 @@ cd ..
 echo powerscale
 cd powerscale
 ansible-playbook -i inventory delete.yaml
-cd ..
+cd ../..
 
 
 echo "Delete Virtual Machines"
