@@ -13,6 +13,6 @@
   tasks:
 
 
-  - name: Create namespace "{{ fio_namespace }}" on master
+  - name: delete namespace "{{ fio_namespace }}" on master
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl delete ns {{ fio_namespace }}"
