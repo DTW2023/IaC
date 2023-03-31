@@ -14,9 +14,9 @@ vol_desc: 'DTW ESXi DataStore'
 iscsi_target: 10.10.30.99
 #iscsi_target_ip2: 10.10.30.47
 #array_ip: '10.204.20.80'
-array_ip: 10.204.20.99
+#array_ip: 10.204.20.99
 #PS 3000T
-array_ip: {{ lookup('env', 'PS_ID') }}"
+array_ip: {{ lookup('env', 'PS_HOSTNAME') }}"
 
 verifycert: false
 user: "{{ lookup('env', 'PS_USERNAME') }}"
