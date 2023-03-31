@@ -16,7 +16,7 @@ iscsi_target: 10.10.30.99
 #array_ip: '10.204.20.80'
 #array_ip: 10.204.20.99
 #PS 3000T
-array_ip: {{ lookup('env', 'PS_HOSTNAME') }}"
+array_ip: "{{ lookup('env', 'PS_HOSTNAME') }}"
 
 verifycert: false
 user: "{{ lookup('env', 'PS_USERNAME') }}"
