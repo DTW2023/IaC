@@ -16,6 +16,8 @@ cd powerscale
 ansible-playbook -i inventory delete.yaml
 cd ../..
 
+echo wait for clean up to finish...
+sleep 30
 
 echo "Delete Virtual Machines"
 cd "2 - Virtual-Machines"
