@@ -19,10 +19,14 @@ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/relea
 helm repo add dell https://dell.github.io/helm-charts
 
 # pull powerstore-config from powerstore-csi driver namespace
-kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: dell-observability-csm/' | kubectl create -f -
+#kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: dell-observability-csm/' | kubectl create -f -
+kubectl create -f 
+
 
 # pull isilon-creds from powerscale-csi driver namespace
-kubectl get secret isilon-creds -n powerscale-csi -o yaml | sed 's/namespace: powerscale-csi/namespace: dell-observability-csm/' | kubectl create -f -
+#kubectl get secret isilon-creds -n powerscale-csi -o yaml | sed 's/namespace: powerscale-csi/namespace: dell-observability-csm/' | kubectl create -f -
+kubectl create -f
+
 
 # install karavi-observability
 helm install karavi-observability dell/karavi-observability -n dell-observability-csm -f values.yaml
