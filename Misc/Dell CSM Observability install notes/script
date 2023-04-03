@@ -20,12 +20,12 @@ helm repo add dell https://dell.github.io/helm-charts
 
 # pull powerstore-config from powerstore-csi driver namespace
 #kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: dell-observability-csm/' | kubectl create -f -
-kubectl create -f 
+kubectl create -f powerstore-config.yaml
 
 
 # pull isilon-creds from powerscale-csi driver namespace
 #kubectl get secret isilon-creds -n powerscale-csi -o yaml | sed 's/namespace: powerscale-csi/namespace: dell-observability-csm/' | kubectl create -f -
-kubectl create -f
+kubectl create -f isilon-creds.yaml
 
 
 # install karavi-observability
