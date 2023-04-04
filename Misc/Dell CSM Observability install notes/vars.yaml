@@ -1,0 +1,4 @@
+---
+grafana_url: http://10.204.20.172
+grafana_user: "admin"
+grafana_password: "admin"
