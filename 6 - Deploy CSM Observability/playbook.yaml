@@ -22,7 +22,7 @@
 
     - name: Pause for 90 seconds to build app
       ansible.builtin.pause:
-      seconds: 90
+        seconds: 90
 
     - name: Import Grafana dashboard
       community.grafana.grafana_dashboard:
