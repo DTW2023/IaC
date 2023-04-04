@@ -331,7 +331,7 @@
       mode: 0777
         
 
-  - name: Deploy CRD for powerscale csi sriver in namespace "{{ ps_namespace }}" on master
+  - name: Deploy CRD for powerscale csi driver in namespace "{{ ps_namespace }}" on master
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create -f /tmp/CR.yaml"
 

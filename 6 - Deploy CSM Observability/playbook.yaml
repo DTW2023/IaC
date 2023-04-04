@@ -20,9 +20,9 @@
         path: //tmp/CSM-OB.sh
         state: absent
 
-    - name: Pause for 30 seconds to build app
+    - name: Pause for {{ pause_seconds }} seconds to build app
       ansible.builtin.pause:
-        seconds: 30
+        seconds: {{ pause_seconds }}
 
     - name: Import Grafana dashboard
       community.grafana.grafana_dashboard:

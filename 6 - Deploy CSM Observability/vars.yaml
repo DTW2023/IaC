@@ -4,6 +4,7 @@ grafana_url: http://10.204.20.172
 grafana_user: "admin"
 # pulled from an environment variable, default is 'admin'
 grafana_password: "{{ lookup('env', 'GRAFANA_PASSWORD') }}"
+pause_seconds: 30
 
 json_dashboard:
   - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/sdc_io_metrics.json

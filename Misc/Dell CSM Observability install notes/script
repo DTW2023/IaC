@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # this script assumes powerstore csi name space is called 'powerstore-csi'
-# it also assumes the powercale csi name space is called 'powerscale-csi'
-# this cript does powerstore and powerscale, didn't have access to a powrflex to add that too!
+# it also assumes the powercale csi name space is called 'powerscale-csi' and that the CSM namespace is 'dell-observability-csm'
+# this script does powerstore and powerscale, didn't have access to a powerflex or powermax to add that too!
 # run this on master node!!!!!!!!!!!!!!!
 
 # creates a newspace
