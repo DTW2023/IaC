@@ -6,7 +6,7 @@ date
 start=`date +%s`
 
 echo delete fio workloads
-cd "6 - Generate Load"
+cd "7 - Generate Load"
 cd powerstore
 echo powerstore
 ansible-playbook -i inventory delete.yaml
