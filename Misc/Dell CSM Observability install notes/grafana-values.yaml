@@ -37,7 +37,8 @@ datasources:
     - name: Prometheus
       type: prometheus
       access: proxy
-      url: 'http://prometheus-server:9090'
+      # You may need to update this
+      url: 'http://prometheus-server.dell-observability-csm.svc.cluster.local:9090'
       isDefault: null
       version: 1
       editable: true
