@@ -1,0 +1,33 @@
+- hosts: master
+  connection: local
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - name: Import Grafana dashboard
+      community.grafana.grafana_dashboard:
+        grafana_url: "{{ grafana_url }}"
+        grafana_user: "{{ grafana_user }}"
+        grafana_password: "{{ grafana_password }}"
+        state: present
+        org_id: 1
+        commit_message: Updated by ansible
+        overwrite: yes
+        path: "{{ item.url }}"
+      loop: "{{ json_dashboard }}"
+      delegate_to: 127.0.0.1
+
+  - name: Download CSM Observability Install Script 
+    when: inventory_hostname in groups['k8s_master']
+    get_url:
+      url: https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/script
+      dest: /tmp/CSM-OB.sh
+      
+  - name: Running CSM Observability Install Script 
+    when: inventory_hostname in groups['k8s_master']
+    command: "sh /tmp/CSM-OB.sh"
+
+  - name: Remove CSM Observability Install Script
+    ansible.builtin.file:
+      path: //tmp/CSM-OB.sh
+      state: absent

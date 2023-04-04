@@ -6,38 +6,38 @@
 # run this on master node!!!!!!!!!!!!!!!
 
 # creates a newspace
-kubectl create namespace dell-observability-csm
+kubectl create namespace dell-observability-csm > /dev/null 2>&1
 
 # installs a cert manager
-kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml > /dev/null 2>&1
 
 # uncomment these if helm is not installed already!!
 #curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 #sh /tmp/get_helm.sh
 
 # Add Dell Delm Charts
-helm repo add dell https://dell.github.io/helm-charts
+helm repo add dell https://dell.github.io/helm-charts > /dev/null 2>&1
 
 # pull powerstore-config from powerstore-csi driver namespace
-kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: dell-observability-csm/' | kubectl create -f -
+kubectl get secret powerstore-config -n powerstore-csi -o yaml | sed 's/namespace: powerstore-csi/namespace: dell-observability-csm/' | kubectl create -f - > /dev/null 2>&1
 
 
 # pull isilon-creds from powerscale-csi driver namespace
-kubectl get secret isilon-creds -n powerscale-csi -o yaml | sed 's/namespace: powerscale-csi/namespace: dell-observability-csm/' | kubectl create -f -
+kubectl get secret isilon-creds -n powerscale-csi -o yaml | sed 's/namespace: powerscale-csi/namespace: dell-observability-csm/' | kubectl create -f - > /dev/null 2>&1
 
 # install karavi-observability
-helm install karavi-observability dell/karavi-observability -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/values.yaml
+helm install karavi-observability dell/karavi-observability -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/values.yaml > /dev/null 2>&1
 
 # prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo add stable https://charts.helm.sh/stable
-helm repo update
-helm install prometheus prometheus-community/prometheus -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/prometheus-values.yaml
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts > /dev/null 2>&1
+helm repo add stable https://charts.helm.sh/stable > /dev/null 2>&1
+helm repo update > /dev/null 2>&1
+helm install prometheus prometheus-community/prometheus -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/prometheus-values.yaml > /dev/null 2>&1
 
 # Grafana
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-helm install grafana grafana/grafana -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/grafana-values.yaml
+helm repo add grafana https://grafana.github.io/helm-charts > /dev/null 2>&1
+helm repo update > /dev/null 2>&1
+helm install grafana grafana/grafana -n dell-observability-csm -f https://raw.githubusercontent.com/DTW2023/IaC/main/Misc/Dell%20CSM%20Observability%20install%20notes/grafana-values.yaml > /dev/null 2>&1
 
 # wait for all CSM observability services to be running
 running=0
