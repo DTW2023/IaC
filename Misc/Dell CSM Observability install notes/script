@@ -41,9 +41,9 @@ helm install grafana grafana/grafana -n dell-observability-csm -f https://raw.gi
 
 # wait for all CSM observability services to be running
 running=0
-while [ $running -ne 12 ];
+while [ $running -ne 8 ];
 do
-running=`kubectl get pods -n dell-observability-csm | egrep "graf|kara|pro" |  egrep -v "max|store|scale"`
+running=`kubectl get pods -n dell-observability-csm | egrep "grafana|prometheus" | grep -c Running`
 sleep 5
 done
 
