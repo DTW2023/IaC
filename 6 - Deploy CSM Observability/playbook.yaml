@@ -20,9 +20,9 @@
         path: //tmp/CSM-OB.sh
         state: absent
 
-    - name: Pause for 90 seconds to build app
+    - name: Pause for 30 seconds to build app
       ansible.builtin.pause:
-        seconds: 90
+        seconds: 30
 
     - name: Import Grafana dashboard
       community.grafana.grafana_dashboard:
@@ -35,4 +35,4 @@
         overwrite: yes
         path: "{{ item.url }}"
       loop: "{{ json_dashboard }}"
-      delegate_to: 127.0.0.1
+      delegate_to: localhost
