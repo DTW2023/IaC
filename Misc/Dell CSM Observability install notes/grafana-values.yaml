@@ -43,6 +43,8 @@ datasources:
       isDefault: null
       version: 1
       editable: true
+      jsonData:
+        tlsSkipVerify: true
 testFramework:
   enabled: false
 sidecar:
