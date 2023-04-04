@@ -5,7 +5,8 @@ image:
   sha: ""
   pullPolicy: IfNotPresent
 service:
-  type: NodePort
+  # NodePort is default, changed to use a URL
+  type: LoadBalancer
 
 ## Administrator credentials when not using an existing Secret
 adminUser: admin
