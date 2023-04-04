@@ -2,137 +2,16 @@
   connection: local
   vars_files:
     - vars.yaml
-    
+
   tasks:
-    - name: Import Grafana dashboard for powerflex/sdc_io_metrics.json
+    - name: Import Grafana dashboard
       community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
+        grafana_url: "{{ grafana_url }}"
+        grafana_user: "{{ grafana_user }}"
+        grafana_password: "{{ grafana_password }}"
         state: present
         org_id: 1
         commit_message: Updated by ansible
         overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/sdc_io_metrics.json
-
-    - name: Import Grafana dashboard for powerflex/volume_io_metrics.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/volume_io_metrics.json
-
-    - name: Import Grafana dashboard for powerflex/storage_consumption.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/storage_consumption.json
-
-    - name: Import Grafana dashboard for powerstore/volume_io_metrics.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/volume_io_metrics.json
-
-    - name: Import Grafana dashboard for powerstore/filesystem_io_metrics.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/filesystem_io_metrics.json
-
-    - name: Import Grafana dashboard for powerstore/storage_consumption.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/storage_consumption.json
-
-    - name: Import Grafana dashboard for powerscale/cluster_io_metrics.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/cluster_io_metrics.json
-
-    - name: Import Grafana dashboard for powerscale/cluster_capacity.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/cluster_capacity.json
-
-
-    - name: Import Grafana dashboard for powerscale/volume_capacity.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/volume_capacity.json
-
-    - name: Import Grafana dashboard for powermax/storage_consumption.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powermax/storage_consumption.json
-
-    - name: Import Grafana dashboard for powermax/performance.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powermax/performance.json
-
-    - name: Import Grafana dashboard for topology/topology.json
-      community.grafana.grafana_dashboard:
-        grafana_url: http://10.204.20.172
-        grafana_user: "admin"
-        grafana_password: "Password01!"
-        state: present
-        org_id: 1
-        commit_message: Updated by ansible
-        overwrite: yes
-        path: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/topology/topology.json
+        path: "{{ item.url }}"
+      loop: "{{ json_dashboard }}"

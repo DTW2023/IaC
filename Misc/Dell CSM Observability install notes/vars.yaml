@@ -1,4 +1,20 @@
 ---
 grafana_url: http://10.204.20.172
 grafana_user: "admin"
-grafana_password: "admin"
+# pulled from an environment variable, default is 'admin'
+grafana_password: "{{ lookup('env', 'GRAFANA_PASSWORD') }}"
+
+json_dashboard:
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/sdc_io_metrics.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/volume_io_metrics.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerflex/storage_consumption.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/volume_io_metrics.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/filesystem_io_metrics.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerstore/storage_consumption.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/cluster_io_metrics.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/cluster_capacity.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powerscale/volume_capacity.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powermax/storage_consumption.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/powermax/performance.json
+  - url: https://raw.githubusercontent.com/dell/karavi-observability/main/grafana/dashboards/topology/topology.json
+
