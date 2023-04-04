@@ -14,7 +14,7 @@
       url: https://download.docker.com/linux/centos/docker-ce.repo
       dest: /etc/yum.repos.d/docker-ce.repo
 
-  - name: Install Docker
+  - name: Install packages for Kubernetes
     yum: 
       name: "{{ packages }}"
       state: present
