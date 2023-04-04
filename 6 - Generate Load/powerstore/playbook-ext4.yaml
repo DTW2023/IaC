@@ -11,8 +11,8 @@
     - ps_hostname: "{{ lookup('env', 'PS_HOSTNAME') }}"
     - nas_server: "{{ lookup('env', 'PS_NASSERVER') }}"
     - ps_id: "{{ lookup('env', 'PS_ID') }}"
-    - fio_namespace: "fio-powerstore-nfs"
-    - storage_class: "powerstore-nfs"
+    - fio_namespace: "fio-powerstore-ext4"
+    - storage_class: "powerstore-ext4"
     - replica_count: "1"
 
   tasks:

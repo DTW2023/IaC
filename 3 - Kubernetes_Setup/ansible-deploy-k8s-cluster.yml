@@ -29,6 +29,13 @@
       - lvm2
       - yum-utils
       - git
+      - iscsi-initiator-utils 
+
+  - name: Start & enable iscsi service
+    ansible.builtin.service:
+      name: iscsid
+      state: started
+      enabled: yes
 
   - name: Disable SELinux
     selinux:
