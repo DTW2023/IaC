@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: minecraft
+  labels:
+    app: minecraft-demo
+  name: minecraft-demo
+spec:
+  replicas: 1
+  serviceName: minecraft-demo
+  selector:
+    matchLabels:
+      app: minecraft-demo
+  template:
+    metadata:
+      labels:
+        app: minecraft-demo
+    spec:
+      containers:
+        - name: mc
+          image: itzg/minecraft-server
+          env:
+            - name: EULA
+              value: "TRUE"
+          volumeMounts:
+            - mountPath: /data
+              name: data
+          readinessProbe:
+            exec:
+              command:
+                - mc-monitor
+                - status
+                - --host
+                - localhost
+                - --port
+                - "25565"
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 18
+  volumeClaimTemplates:
+    - metadata:
+        namespace: minecraft
+        name: data
+      spec:
+        storageClassName: powerstore-nfs
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: minecraft
+  labels:
+    service: minecraft-demo
+  name: minecraft-demo
+spec:
+  ports:
+    - port: 25565
+      targetPort: 25565
+  selector:
+    app: minecraft-demo
+  type: LoadBalancer

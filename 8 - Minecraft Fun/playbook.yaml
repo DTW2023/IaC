@@ -1,0 +1,20 @@
+---
+# tested with ansible 2.14.3 on Ubuntu 22.04.1 LTS, master and workers running centos 7
+# martin.flint@dell.com
+
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yaml
+
+  tasks: 
+ 
+ 
+  - name: Create namespace minecraft on master
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create ns minecraft"
+
+  - name: Deploy Minecraft Statefulset
+    when: inventory_hostname in groups['k8s_master']
+    shell: "kubectl apply -f "
