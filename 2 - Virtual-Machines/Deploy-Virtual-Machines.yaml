@@ -30,9 +30,16 @@
             device_name: "{{ item.device }}"
             ip: "{{ item.ip_address }}"
             netmask: "{{ item.netmask }}"
-            gateway: "{{ item.defaultgw }}"
+            gateway: "{{ item.defaultgw | default(omit) }}"
             dns_servers:
             - "{{ item.dns_server }}"
+            domain: "{{ item.dns_domainname }}"
+          - name: "{{ item.iscsi_dvswitch }}"
+            device_name: "{{ item.iscsi_device }}"
+            ip: "{{ item.iscsi_ip_address }}"
+            netmask: "{{ item.iscsi_netmask }}"
+            dns_servers:
+              - "{{ item.dns_server }}"
             domain: "{{ item.dns_domainname }}"
         customization:
           dns_servers:
