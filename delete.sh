@@ -5,6 +5,11 @@ echo -n "Started "
 date
 start=`date +%s`
 
+echo delete minecraft server
+cd "8 - Minecraft Fun"
+ansible-playbook -i inventory delete.yaml
+cd ..
+
 echo delete fio workloads
 cd "7 - Generate Load"
 cd powerstore
