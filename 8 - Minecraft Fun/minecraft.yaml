@@ -43,7 +43,7 @@ spec:
         namespace: minecraft
         name: data
       spec:
-        storageClassName: powerstore-nfs
+        storageClassName: powerstore-xfs
         accessModes:
           - ReadWriteOnce
         resources:
