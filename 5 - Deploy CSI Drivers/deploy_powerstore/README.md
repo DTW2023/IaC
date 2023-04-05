@@ -16,3 +16,5 @@ variable "storage_class" is what you want to call the storage class, in this cas
 to run:
 
 ansible-playbook -i inv plakbook.yaml
+
+note: this creates powerstore-xfs, powerstore-ext4, and powerstore-ext3 storageclasses. the names are hard coded, but pulls ArrayID from PS_ID environment variable
