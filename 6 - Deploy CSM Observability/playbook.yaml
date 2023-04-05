@@ -1,5 +1,5 @@
 ---
-- hosts: master
+- hosts: all
   vars_files:
     - vars.yaml
 
@@ -20,9 +20,9 @@
         path: //tmp/CSM-OB.sh
         state: absent
 
-    - name: Pause for {{ pause_seconds }} seconds to build app
+    - name: Pause for "{{ app_pause_secs }}" seconds to build app
       ansible.builtin.pause:
-        seconds: {{ pause_seconds }}
+        seconds: "{{ app_pause_secs }}"
 
     - name: Import Grafana dashboard
       community.grafana.grafana_dashboard:
@@ -35,4 +35,3 @@
         overwrite: yes
         path: "{{ item.url }}"
       loop: "{{ json_dashboard }}"
-      delegate_to: localhost

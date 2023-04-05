@@ -4,7 +4,7 @@ grafana_url: http://10.204.20.172
 grafana_user: "admin"
 # pulled from an environment variable, default is 'admin'
 grafana_password: "{{ lookup('env', 'GRAFANA_PASSWORD') }}"
-pause_seconds: 30
+app_pause_secs: 30
 
 json_dashboard:
 # I only have a powerstore and a powerscale in my lab, so no need to install dashboards for powerflex or powermax
