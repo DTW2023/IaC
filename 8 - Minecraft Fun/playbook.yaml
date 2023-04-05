@@ -5,9 +5,6 @@
 - hosts: all
   become: true
 
-  vars_files:
-    - vars.yaml
-
   tasks: 
  
  
@@ -17,4 +14,4 @@
 
   - name: Deploy Minecraft Statefulset
     when: inventory_hostname in groups['k8s_master']
-    shell: "kubectl apply -f "
+    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Minecraft%20Fun/minecraft.yaml"
