@@ -3,15 +3,18 @@
 # martin.flint@dell.com
 
 - hosts: all
+  vars_files:
+    - vars.yaml
   become: true
 
   tasks: 
  
  
-  - name: Create namespace minecraft on master
+  - name: "Create namespace {{ mc_namespace }} on master"
     when: inventory_hostname in groups['k8s_master']
-    command: "kubectl create ns minecraft"
+    command: "kubectl create ns {{ mc_namespace }}"
 
   - name: Deploy Minecraft Statefulset
     when: inventory_hostname in groups['k8s_master']
     shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Minecraft%20Fun/minecraft.yaml"
+
