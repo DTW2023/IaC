@@ -125,6 +125,7 @@
     copy:
       content: |
         #!/bin/sh 
+        echo does not use nfs.....
         for i in `seq 2 5`
         do 
           for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }' | grep -vi nfs`
