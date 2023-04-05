@@ -127,7 +127,7 @@
         #!/bin/sh 
         for i in `seq 2 5`
         do 
-          for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }'`
+          for NS in `kubectl get ns | grep "^fio-" | awk '{ print $1 }' | grep -vi nfs`
           do
             echo setting replicas to $i for namespace $NS
             kubectl scale --replicas=$i statefulset.apps/fio -n $NS
