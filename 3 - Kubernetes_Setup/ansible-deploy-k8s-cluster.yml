@@ -279,11 +279,3 @@
     ansible.builtin.file:
       path: /tmp/helm.tgz
       state: absent
-
-#  - name: Deploy Grafana Operator
-#    when: inventory_hostname in groups['k8s_master']
-#    command: "kubectl create -f https://operatorhub.io/install/grafana-operator.yaml"
-#
-#  - name: Deploy Prometheus Operator
-#    when: inventory_hostname in groups['k8s_master']
-#    command: "kubectl create -f https://operatorhub.io/install/prometheus.yaml"
