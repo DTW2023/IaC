@@ -32,7 +32,6 @@
       - iscsi-initiator-utils 
 
   - name: Generate an iqn and store in /etc/iscsi/initiatorname.iscsi
-    when: inventory_hostname in groups['k8s_master']
     copy:
       content: |
         InitiatorName=iqn.1994-05.local.storage:{{ inventory_hostname }}
