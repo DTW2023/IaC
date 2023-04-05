@@ -31,6 +31,16 @@
       - git
       - iscsi-initiator-utils 
 
+  - name: Generate an iqn and store in /etc/iscsi/initiatorname.iscsi
+    when: inventory_hostname in groups['k8s_master']
+    copy:
+      content: |
+        InitiatorName=iqn.1994-05.local.storage:{{ inventory_hostname }}
+      dest: "/etc/iscsi/initiatorname.iscsi"
+      mode: 0644
+      owner: root
+      group: root
+
   - name: Start & enable iscsi service
     ansible.builtin.service:
       name: iscsid
