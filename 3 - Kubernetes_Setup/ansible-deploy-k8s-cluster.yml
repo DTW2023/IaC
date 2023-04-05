@@ -279,3 +279,8 @@
     ansible.builtin.file:
       path: /tmp/helm.tgz
       state: absent
+
+  - name: Pause for 60 seconds and wait for everyting to stablize
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.pause:
+      seconds: 60
