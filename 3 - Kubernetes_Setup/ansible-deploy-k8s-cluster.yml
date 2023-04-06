@@ -194,7 +194,7 @@
 
   - name: Install OLM on master
     when: inventory_hostname in groups['k8s_master']
-    shell: "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.23.1/install.sh | bash -s v0.23.1"
+    shell: "curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.24.0/install.sh | bash -s v0.24.0"
 
   - name: Install Dell CSI Operator on master
     when: inventory_hostname in groups['k8s_master']
