@@ -160,6 +160,7 @@
         reclaimPolicy: Delete
         allowVolumeExpansion: true
         volumeBindingMode: Immediate
+        # Using NFS v3, my centos 7 VM's seemed to have an issue wiht NFS v4. I guess we could have 2 storage classes for v3 and v4, but haven't set up!
         mountOptions:
           - hard
           - nfsvers=3
