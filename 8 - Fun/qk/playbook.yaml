@@ -3,8 +3,7 @@
 # martin.flint@dell.com
 
 - hosts: all
-  vars_files:
-    - vars.yaml
+
   become: true
 
   tasks: 
