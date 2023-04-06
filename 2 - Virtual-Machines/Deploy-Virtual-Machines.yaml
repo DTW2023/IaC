@@ -34,10 +34,10 @@
             dns_servers:
             - "{{ item.dns_server }}"
             domain: "{{ item.dns_domainname }}"
-          - name: "{{ item.iscsi_dvswitch }}"
-            device_name: "{{ item.iscsi_device }}"
-            ip: "{{ item.iscsi_ip_address }}"
-            netmask: "{{ item.iscsi_netmask }}"
+          - name: "{{ item.iscsi_dvswitch | default(omit) }}"
+            device_name: "{{ item.iscsi_device | default(omit) }}"
+            ip: "{{ item.iscsi_ip_address | default(omit)}}"
+            netmask: "{{ item.iscsi_netmask | default(omit) }}"
             dns_servers:
               - "{{ item.dns_server }}"
             domain: "{{ item.dns_domainname }}"
