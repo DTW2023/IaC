@@ -23,6 +23,6 @@
     command: "kubectl delete ns {{ fio_namespace }}"
 
     # hard-coded this
-  - name: delete namespace powerstore-nfs on master
+  - name: delete namespace fio-powerstore-nfs on master
     when: inventory_hostname in groups['k8s_master']
-    command: "kubectl delete ns powerstore-nfs "
+    command: "kubectl delete ns fio-powerstore-nfs "
