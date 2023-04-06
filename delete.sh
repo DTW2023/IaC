@@ -6,9 +6,9 @@ date
 start=`date +%s`
 
 echo delete minecraft server
-cd "8 - Minecraft Fun"
+cd "8 - Fun/mc"
 ansible-playbook -i inventory delete.yaml
-cd ..
+cd ../..
 
 echo delete fio workloads
 cd "7 - Generate Load"
