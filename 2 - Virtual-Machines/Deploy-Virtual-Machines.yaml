@@ -30,7 +30,7 @@
             device_name: "{{ item.device }}"
             ip: "{{ item.ip_address }}"
             netmask: "{{ item.netmask }}"
-            gateway: "{{ item.defaultgw | default(omit) }}"
+            gateway: "{{ item.defaultgw }}"
             dns_servers:
             - "{{ item.dns_server }}"
             domain: "{{ item.dns_domainname }}"
