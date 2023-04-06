@@ -421,7 +421,7 @@
       dest: "/tmp/SC.yaml"
       mode: 0777
         
-  - name: Remove file /tmp/SC.yaml
+  - name: Deploy Storage Class
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create -f /tmp/SC.yaml"
 
