@@ -19,7 +19,9 @@ server:
   persistentVolume:
     enabled: false
   service:
-    type: NodePort
+    #type: NodePort
+    # Changed to LoadBalancer so we can import alerts into prometheus
+    type: LoadBalancer
     servicePort: 9090
 extraScrapeConfigs: |
   - job_name: 'karavi-metrics-dell-observability-csm'
