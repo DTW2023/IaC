@@ -38,14 +38,46 @@
       dellemc.datadomain.adminaccess:
         state: show
 
-    - name:  Creates a filesystem with the active tier storage
+    - name:  Creates a filesystem on active tier storage
       dellemc.datadomain.filesys:
           state: create
 
-    - name:  Enable a filesystem Operations
+      - name: Set the encryption algorithm to aes_128_gcm
+      dellemc.datadomain.filesys:
+          state: set
+          operation: encryption
+          encryption: algorithm
+          # options are aes_128_cbc | aes_256_cbc | aes_128_gcm | aes_256_gcm
+          algorithm: aes_128_gcm
+
+    - name:  Apply current encryption configuration to filesystem
+      dellemc.datadomain.filesys:
+          state: apply-changes
+          operation: encryption
+
+    - name:  Enablefilesystem Operations
       dellemc.datadomain.filesys:
           state: enable
 
+    - name:  Set the Schedule
+      dellemc.datadomain.filesys:
+          state: set
+          operation: clean
+          clean:
+              schedule: daily 3:00
+
+    - name: Enable NFS clients to connect
+      dellemc.datadomain.nfs:
+          state: enable
+
+    - name: Create an export, optionally add clients
+      dellemc.datadomain.nfs:
+          state: create
+          export-name: backupserver01
+          path: /data/col1/backupserver01
+          clients: 10.204.20.0/24
+          options: 'rw,no_root_squash,no_all_squash,secure'
+          # Even if Path does not exists, nfs share will be created. So use MTree module to create it.
 
 # enabel DDbost protocol
 # set passphrase?
