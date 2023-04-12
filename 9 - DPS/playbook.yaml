@@ -50,6 +50,6 @@
       timeout: 600
     register: waitforddve
 
-    - name:  admin access
-      dellemc.datadomain.adminaccess:
-        state: show
+  - name:  admin access
+    dellemc.datadomain.adminaccess:
+      state: show
