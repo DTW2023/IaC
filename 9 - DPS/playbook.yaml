@@ -1,7 +1,7 @@
 - name: Data Domain Playbook.
   hosts: dd
   connection: local
-  gather_facts: false
+  gather_facts: true
 
   tasks:
     - name:  Show Network settings using password "{{ ansible_ssh_pass }}" and user "{{ ansible_user }}" on port "{{ ansible_port }}"
