@@ -36,7 +36,7 @@
             type: thin
             datastore: "{{ datastore }}"
             state: present
-            scsi_controller: 1
+            scsi_controller: 0
             unit_number: 3
             scsi_type: 'paravirtual'
       delegate_to: localhost
