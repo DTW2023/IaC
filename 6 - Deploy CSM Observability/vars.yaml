@@ -1,6 +1,7 @@
 ---
 # grafana_url needs to be an ip address deployed via metallb under '3 - Kubernetes_Setup/support/metallb.yaml' .172 will be 2nd available after nginx
-grafana_url: http://10.204.20.172
+grafana_ip: '10.204.20.172'
+grafana_url: "http://{{ grafana_ip }}"
 grafana_user: "admin"
 # pulled from an environment variable, default is 'admin'
 grafana_password: "{{ lookup('env', 'GRAFANA_PASSWORD') }}"

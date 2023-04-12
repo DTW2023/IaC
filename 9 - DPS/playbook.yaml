@@ -9,7 +9,7 @@
   tasks:
 
 # DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
-    - name: Deploy Virtual Machines
+    - name: "Deploy Virtual Machine  {{vmname}}"
       vmware_guest:
         hostname: "{{ vc_hostname }}"
         username: "{{ vc_username }}"
@@ -44,7 +44,7 @@
 
     - name:  Enable a filesystem Operations
       dellemc.datadomain.filesys:
-          state: create
+          state: enable
 
 
 # enabel DDbost protocol
