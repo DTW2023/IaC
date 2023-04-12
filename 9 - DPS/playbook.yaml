@@ -8,49 +8,25 @@
     - vars/credentials.yaml
 
   tasks:
-    - set_fact:
-        vm_name: "ansible"
-
-    - name: "Find folder for VM - {{ vm_name }}"
-      vmware_guest_find:
-        hostname: "{{ vcenter_host }}"
-        username: "{{ vcenter_id }}"
-        password: "{{ vcenter_pwd }}"
-        validate_certs: False
-        name: "{{ vm_name }}"
-      delegate_to: localhost
-      register: vm_facts
       
-# DEPLOY THE DDVE OVA TO VCENTER
-    - name: Deploy PowerProtect Data Domain
-      vmware_deploy_ovf:
-        hostname: "{{vcenter_host}}"
-        username: "{{vcenter_id}}"
-        password: "{{vcenter_pwd}}"
-        esxi_hostname: "{{ esxi_host }}"
-        validate_certs: no
-        name: "{{ddve_host}}"
-        datacenter: "{{vcenter_dc}}"
-        folder: "{{vcenter_folder}}"
-        datastore: "{{vcenter_ds}}"
-        disk_provisioning: thin
-        networks: 
-          "VM Network 1": "{{vcenter_network}}"
-          "VM Network 2": "{{vcenter_network}}"
-        ova: "{{artifact_path}}/{{ddve_ova}}"
-        allow_duplicates: no
-        fail_on_spec_warnings: no
-        wait: no
-        wait_for_ip_address: no
-        inject_ovf_env: yes
-        properties:
-          hostname: "{{ddve_host}}.{{ad_domain}}"
-          ipAddress: "{{ddve_ip}}"
-          netmask: "{{ddve_netmask}}"
-          gateway: "{{ddve_gateway}}"
-          dnsServer1: "{{ddve_dns1}}"
-          #dnsServer2: "{{ddve_dns2}}"
-        power_on: yes
+# DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
+    - name: Deploy Virtual Machines
+      vmware_guest:
+        hostname: "{{ vc_hostname }}"
+        #resource_pool: "{{ rp }}"
+        username: "{{ vc_username }}"
+        password: "{{vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        name: "{{ item.host_name }}"
+        template: "{{ item.vm_template }}"
+        datacenter: "{{ item.datacenter }}"
+        esxi_hostname: "{{ item.esxi_host }}"
+        folder: 'vm'
+        datastore: "{{ item.datastore }}"
+        state: poweredon
+      loop: "{{ guests }}"
+      loop_control:
+        pause: 2
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN  
     - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
