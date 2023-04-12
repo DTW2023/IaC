@@ -70,6 +70,42 @@
           options: 'rw,no_root_squash,no_all_squash,secure'
           # Even if Path does not exists, nfs share will be created. So use MTree module to create it.
 
+
+    - name: Enable ddboost
+      dellemc.datadomain.ddboost:
+          state: enable
+
+    - name:  Add a new user
+      dellemc.datadomain.users:
+          state: add
+          user-name: dtw-boost
+          role-name: admin
+          user-password: "{{ dd_password }}"
+          dd-password: "{{ dd_password }}"
+
+
+    - name: Create the ddboost storage unit
+      dellemc.datadomain.ddboost:
+          state: create
+          storage-unit: storage_unit-test
+          user-name: dtw-boost
+          ## Optional parameters
+          quota:
+              quota-soft-limit: 10 GiB
+              quota-hard-limit: 15 GiB
+              report-physical-size: 10 GiB
+          stream-limit:
+              write-stream-soft-limit: 10 # or none - remove limit
+              read-stream-soft-limit: 15 # or none - remove limit
+              repl-stream-soft-limit: 13 # or none - remove limit
+              combined-stream-soft-limit: 20 # or none - remove limit
+              combined-stream-hard-limit: 20 # or none - remove limit          
+
+    - name: Assign the username to the ddboost protocol
+      dellemc.datadomain.ddboost:
+          state: assign
+          user-name: dtw-boost
+
 # enabel DDbost protocol
 # set passphrase?
 
