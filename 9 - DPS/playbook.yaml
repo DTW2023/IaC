@@ -75,11 +75,19 @@
       dellemc.datadomain.ddboost:
           state: enable
 
-    - name:  Add a new user
+    - name:  Add a new ddboost user
       dellemc.datadomain.users:
           state: add
           user-name: dtw-boost
           role-name: admin
+          user-password: "{{ dd_password }}"
+          dd-password: "{{ dd_password }}"
+
+    - name:  Add security user secadmin
+      dellemc.datadomain.users:
+          state: add
+          user-name: secadmin
+          role-name: security
           user-password: "{{ dd_password }}"
           dd-password: "{{ dd_password }}"
 
