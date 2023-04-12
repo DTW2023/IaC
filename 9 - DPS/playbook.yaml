@@ -46,6 +46,15 @@
         option: location
         location: 'Limerick-CSC' # This could be RACK location
 
+    - name: Add time servers
+      dellemc.datadomain.ntp:
+          state: add
+          timeserver: 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org
+
+    - name: enable the NTP local server
+      dellemc.datadomain.ntp:
+          state: enable
+
     - name: Set the mail (SMTP) server
       dellemc.datadomain.config:
         state: set
