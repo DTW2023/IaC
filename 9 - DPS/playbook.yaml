@@ -21,8 +21,6 @@
         esxi_hostname: "{{ esxi_host }}"
         folder: 'vm'
         datastore: "{{ datastore }}"
-        state: poweredon
-
 
 
     - name: Add disks to virtual machine using UUID
@@ -41,8 +39,22 @@
             scsi_controller: 1
             unit_number: 3
             scsi_type: 'paravirtual'
-    delegate_to: localhost
-    register: disk_facts
+      delegate_to: localhost
+      register: disk_facts
+
+    - name: Deploy Virtual Machines
+      vmware_guest:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        name: "{{ vmname }}"
+        template: "{{ vm_template }}"
+        datacenter: "{{ datacenter }}"
+        esxi_hostname: "{{ esxi_host }}"
+        folder: 'vm'
+        datastore: "{{ datastore }}"
+        state: poweredon
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
     - name: " {{vmname}} - Waiting for HTTPS connectivity."
