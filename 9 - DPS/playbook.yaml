@@ -3,33 +3,28 @@
   connection: local
   gather_facts: false
 
-  vars:
   vars_files:
     - vars/credentials.yaml
 
   tasks:
-      
+
 # DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
     - name: Deploy Virtual Machines
       vmware_guest:
         hostname: "{{ vc_hostname }}"
-        #resource_pool: "{{ rp }}"
         username: "{{ vc_username }}"
         password: "{{vc_password }}"
         validate_certs: "{{ validate_certs }}"
-        name: "{{ item.host_name }}"
-        template: "{{ item.vm_template }}"
-        datacenter: "{{ item.datacenter }}"
-        esxi_hostname: "{{ item.esxi_host }}"
+        name: "{{ vmname }}"
+        template: "{{ vm_template }}"
+        datacenter: "{{ datacenter }}"
+        esxi_hostname: "{{ esxi_host }}"
         folder: 'vm'
-        datastore: "{{ item.datastore }}"
+        datastore: "{{ datastore }}"
         state: poweredon
-      loop: "{{ guests }}"
-      loop_control:
-        pause: 2
 
-# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN  
-    - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
+# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
+    - name: "( {{vmname}} ): Waiting for HTTPS connectivity."
       wait_for:
         host: "{{ddve_ip}}"
         port: 443
