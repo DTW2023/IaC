@@ -9,6 +9,23 @@
 
   tasks:
 
+  tasks:
+    - set_fact:
+        vm_name: "ansible"
+
+    - name: "Find folder for VM - {{ vm_name }}"
+      vmware_guest_find:
+        hostname: "{{ vcenter_host }}"
+        username: "{{ vcenter_id }}"
+        password: "{{ vcenter_pwd }}"
+        validate_certs: False
+        name: "{{ vm_name }}"
+      delegate_to: localhost
+      register: vm_facts
+
+  - name: wait
+      pause:
+      
 # DEPLOY THE DDVE OVA TO VCENTER
   - name: Deploy PowerProtect Data Domain
     vmware_deploy_ovf:
