@@ -34,7 +34,7 @@
         validate_certs: no
         name: "{{ vmname }}"
         disk:
-          - size_mb: 5000
+          - size: 500Gb
             type: thin
             datastore: "{{ datastore }}"
             state: present
