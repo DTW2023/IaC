@@ -34,11 +34,11 @@
         timeout: 600
       register: waitforddve
 
-    - name:  Creates a filesystem on active tier storage
+    - name:  Create a filesystem on active tier storage
       dellemc.datadomain.filesys:
           state: create
 
-    - name:  Enablefilesystem Operations
+    - name:  Enable filesystem Operations
       dellemc.datadomain.filesys:
           state: enable
 
