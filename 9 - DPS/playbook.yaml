@@ -7,3 +7,4 @@
     - name:  Show Network settings using password "{{ ansible_ssh_pass }}" and user "{{ ansible_user }}" on port "{{ ansible_port }}"
       dellemc.datadomain.net:
         state: show
+      delegate_to: localhost
