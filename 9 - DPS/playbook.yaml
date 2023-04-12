@@ -1,0 +1,9 @@
+- name: Data Domain Playbook.
+  hosts: dd
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name:  Show Network settings
+      dellemc.datadomain.net:
+        state: show
