@@ -34,29 +34,29 @@
         timeout: 600
       register: waitforddve
 
-  - name: Set email address for alerts, detailed-autosupport and daily alert summary emails
-    dellemc.datadomain.config
-      state: set
-      option: admin-email
-      admin-email: "{{ email }}"
+    - name: Set email address for alerts, detailed-autosupport and daily alert summary emails
+      dellemc.datadomain.config
+        state: set
+        option: admin-email
+        admin-email: "{{ email }}"
 
-  - name: Set the administrative host
-    dellemc.datadomain.config
-      state: set
-      option: location
-      location: 'Limerick CSC' # This could be RACK location
+    - name: Set the administrative host
+      dellemc.datadomain.config
+        state: set
+        option: location
+        location: 'Limerick CSC' # This could be RACK location
 
-  - name: Set the mail (SMTP) server
-    dellemc.datadomain.config
-      state: set
-      option: mailserver
-      mailserver: '10.204.20.2' # SMTP server IP/hostname
+    - name: Set the mail (SMTP) server
+      dellemc.datadomain.config
+        state: set
+        option: mailserver
+        mailserver: '10.204.20.2' # SMTP server IP/hostname
 
-  - name: Set the timezone 
-    dellemc.datadomain.config
-      state: set
-      option: timezone
-      timezone: 'US/Eastern'
+    - name: Set the timezone 
+      dellemc.datadomain.config
+        state: set
+        option: timezone
+        timezone: 'US/Eastern'
 
     - name:  Create a filesystem on active tier storage
       dellemc.datadomain.filesys:
