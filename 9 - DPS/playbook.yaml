@@ -23,6 +23,27 @@
         datastore: "{{ datastore }}"
         state: poweredon
 
+
+
+    - name: Add disks to virtual machine using UUID
+      vmware_guest_disk:
+        hostname: "{{ vc_hostname }}"
+        username: "{{ vc_username }}"
+        password: "{{ vc_password }}"
+        datacenter: "{{ datacenter }}"
+        validate_certs: no
+        name: "{{ vmname }}"
+        disk:
+          - size_mb: 5000
+            type: thin
+            datastore: "{{ datastore }}"
+            state: present
+            scsi_controller: 1
+            unit_number: 3
+            scsi_type: 'paravirtual'
+    delegate_to: localhost
+    register: disk_facts
+
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
     - name: " {{vmname}} - Waiting for HTTPS connectivity."
       wait_for:
