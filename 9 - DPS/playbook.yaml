@@ -83,15 +83,6 @@
           user-password: "{{ dd_password }}"
           dd-password: "{{ dd_password }}"
 
-    - name:  Add security user secadmin
-      dellemc.datadomain.users:
-          state: add
-          user-name: secadmin
-          role-name: security
-          user-password: "{{ dd_password }}"
-          dd-password: "{{ dd_password }}"
-
-
     - name: Create the ddboost storage unit
       dellemc.datadomain.ddboost:
           state: create
