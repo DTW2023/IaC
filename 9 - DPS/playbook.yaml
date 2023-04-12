@@ -42,7 +42,7 @@
       dellemc.datadomain.filesys:
           state: create
 
-      - name: Set the encryption algorithm to aes_128_gcm
+    - name: Set the encryption algorithm to aes_128_gcm
       dellemc.datadomain.filesys:
           state: set
           operation: encryption
