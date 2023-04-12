@@ -1,7 +1,2 @@
 [dd]
 10.204.20.154
-
-[dd:vars]
-ansible_port = 22
-ansible_user = sysadmin
-ansible_ssh_pass = "{{ lookup('env', 'VC_PASSWORD') }}"
