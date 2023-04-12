@@ -20,9 +20,6 @@
         name: "{{ vm_name }}"
       delegate_to: localhost
       register: vm_facts
-
-    - name: wait
-        pause:
       
 # DEPLOY THE DDVE OVA TO VCENTER
     - name: Deploy PowerProtect Data Domain
@@ -30,6 +27,7 @@
         hostname: "{{vcenter_host}}"
         username: "{{vcenter_id}}"
         password: "{{vcenter_pwd}}"
+        esxi_hostname: "{{ esxi_host }}"
         validate_certs: no
         name: "{{ddve_host}}"
         datacenter: "{{vcenter_dc}}"
