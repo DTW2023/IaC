@@ -23,7 +23,7 @@
         datastore: "{{ datastore }}"
 
 
-    - name: Add disks to virtual machine using UUID
+    - name: Add disks to {{ vmname }}
       vmware_guest_disk:
         hostname: "{{ vc_hostname }}"
         username: "{{ vc_username }}"
@@ -42,7 +42,7 @@
       delegate_to: localhost
       register: disk_facts
 
-    - name: Deploy Virtual Machines
+    - name: Power on {{ vmname }}
       vmware_guest:
         hostname: "{{ vc_hostname }}"
         username: "{{ vc_username }}"
@@ -50,7 +50,6 @@
         validate_certs: "{{ validate_certs }}"
         name: "{{ vmname }}"
         template: "{{ vm_template }}"
-        datacenter: "{{ datacenter }}"
         esxi_hostname: "{{ esxi_host }}"
         folder: 'vm'
         datastore: "{{ datastore }}"
