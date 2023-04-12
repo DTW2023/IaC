@@ -40,11 +40,11 @@
         option: admin-email
         admin-email: "{{ email }}"
 
-    - name: Set the administrative host
+    - name: Set the location
       dellemc.datadomain.config:
         state: set
         option: location
-        location: 'Limerick CSC' # This could be RACK location
+        location: 'Limerick-CSC' # This could be RACK location
 
     - name: Set the mail (SMTP) server
       dellemc.datadomain.config:
