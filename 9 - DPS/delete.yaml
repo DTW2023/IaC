@@ -21,4 +21,5 @@
         esxi_hostname: "{{ esxi_host }}"
         folder: 'vm'
         datastore: "{{ datastore }}"
+        force: yes
         state: absent
