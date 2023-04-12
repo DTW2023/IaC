@@ -8,8 +8,6 @@
     - vars/credentials.yaml
 
   tasks:
-
-  tasks:
     - set_fact:
         vm_name: "ansible"
 
@@ -23,50 +21,50 @@
       delegate_to: localhost
       register: vm_facts
 
-  - name: wait
-      pause:
+    - name: wait
+        pause:
       
 # DEPLOY THE DDVE OVA TO VCENTER
-  - name: Deploy PowerProtect Data Domain
-    vmware_deploy_ovf:
-      hostname: "{{vcenter_host}}"
-      username: "{{vcenter_id}}"
-      password: "{{vcenter_pwd}}"
-      validate_certs: no
-      name: "{{ddve_host}}"
-      datacenter: "{{vcenter_dc}}"
-      folder: "{{vcenter_folder}}"
-      datastore: "{{vcenter_ds}}"
-      disk_provisioning: thin
-      networks: 
-        "VM Network 1": "{{vcenter_network}}"
-        "VM Network 2": "{{vcenter_network}}"
-      ova: "{{artifact_path}}/{{ddve_ova}}"
-      allow_duplicates: no
-      fail_on_spec_warnings: no
-      wait: no
-      wait_for_ip_address: no
-      inject_ovf_env: yes
-      properties:
-        hostname: "{{ddve_host}}.{{ad_domain}}"
-        ipAddress: "{{ddve_ip}}"
-        netmask: "{{ddve_netmask}}"
-        gateway: "{{ddve_gateway}}"
-        dnsServer1: "{{ddve_dns1}}"
-        #dnsServer2: "{{ddve_dns2}}"
-      power_on: yes
+    - name: Deploy PowerProtect Data Domain
+      vmware_deploy_ovf:
+        hostname: "{{vcenter_host}}"
+        username: "{{vcenter_id}}"
+        password: "{{vcenter_pwd}}"
+        validate_certs: no
+        name: "{{ddve_host}}"
+        datacenter: "{{vcenter_dc}}"
+        folder: "{{vcenter_folder}}"
+        datastore: "{{vcenter_ds}}"
+        disk_provisioning: thin
+        networks: 
+          "VM Network 1": "{{vcenter_network}}"
+          "VM Network 2": "{{vcenter_network}}"
+        ova: "{{artifact_path}}/{{ddve_ova}}"
+        allow_duplicates: no
+        fail_on_spec_warnings: no
+        wait: no
+        wait_for_ip_address: no
+        inject_ovf_env: yes
+        properties:
+          hostname: "{{ddve_host}}.{{ad_domain}}"
+          ipAddress: "{{ddve_ip}}"
+          netmask: "{{ddve_netmask}}"
+          gateway: "{{ddve_gateway}}"
+          dnsServer1: "{{ddve_dns1}}"
+          #dnsServer2: "{{ddve_dns2}}"
+        power_on: yes
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN  
-  - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
-    wait_for:
-      host: "{{ddve_ip}}"
-      port: 443
-      state: started
-      delay: 1
-      sleep: 60
-      timeout: 600
-    register: waitforddve
+    - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
+      wait_for:
+        host: "{{ddve_ip}}"
+        port: 443
+        state: started
+        delay: 1
+        sleep: 60
+        timeout: 600
+      register: waitforddve
 
-  - name:  admin access
-    dellemc.datadomain.adminaccess:
-      state: show
+    - name:  admin access
+      dellemc.datadomain.adminaccess:
+        state: show
