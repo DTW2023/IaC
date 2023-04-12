@@ -42,19 +42,6 @@
       dellemc.datadomain.filesys:
           state: create
 
-    - name: Set the encryption algorithm to aes_128_gcm
-      dellemc.datadomain.filesys:
-          state: set
-          operation: encryption
-          encryption: algorithm
-          # options are aes_128_cbc | aes_256_cbc | aes_128_gcm | aes_256_gcm
-          algorithm: aes_128_gcm
-
-    - name:  Apply current encryption configuration to filesystem
-      dellemc.datadomain.filesys:
-          state: apply-changes
-          operation: encryption
-
     - name:  Enablefilesystem Operations
       dellemc.datadomain.filesys:
           state: enable
