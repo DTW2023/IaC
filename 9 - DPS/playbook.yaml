@@ -55,16 +55,16 @@
         power_on: yes
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN  
-    - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
-      wait_for:
-        host: "{{ddve_ip}}"
-        port: 443
-        state: started
-        delay: 1
-        sleep: 60
-        timeout: 600
-      register: waitforddve
+      - name: "( {{ddve_host}} ): Waiting for HTTPS connectivity."
+        wait_for:
+          host: "{{ddve_ip}}"
+          port: 443
+          state: started
+          delay: 1
+          sleep: 60
+          timeout: 600
+        register: waitforddve
 
-    - name:  admin access
-      dellemc.datadomain.adminaccess:
-        state: show
+      - name:  admin access
+        dellemc.datadomain.adminaccess:
+          state: show
