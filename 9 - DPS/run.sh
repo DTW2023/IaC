@@ -1,0 +1,1 @@
+ansible-playbook -i inventory playbook.yaml -e "ansible_ssh_pass=$DD_PASSWORD"
