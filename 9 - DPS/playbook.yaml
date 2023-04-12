@@ -24,7 +24,7 @@
         state: poweredon
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
-    - name: "( {{vmname}} ): Waiting for HTTPS connectivity."
+    - name: " {{vmname}} - Waiting for HTTPS connectivity."
       wait_for:
         host: "{{ddve_ip}}"
         port: 443
@@ -37,3 +37,16 @@
     - name:  admin access
       dellemc.datadomain.adminaccess:
         state: show
+
+    - name:  Creates a filesystem with the active tier storage
+      dellemc.datadomain.filesys:
+          state: create
+
+    - name:  Enable a filesystem Operations
+      dellemc.datadomain.filesys:
+          state: create
+
+
+# enabel DDbost protocol
+# set passphrase?
+
