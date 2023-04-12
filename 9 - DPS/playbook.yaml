@@ -34,10 +34,6 @@
         timeout: 600
       register: waitforddve
 
-    - name:  admin access
-      dellemc.datadomain.adminaccess:
-        state: show
-
     - name:  Creates a filesystem on active tier storage
       dellemc.datadomain.filesys:
           state: create
@@ -53,18 +49,18 @@
           clean:
               schedule: 'daily 03:00'
 
-    - name: Enable NFS clients to connect
-      dellemc.datadomain.nfs:
-          state: enable
-
     - name: Create a MTree
       dellemc.datadomain.mtree:
           state: create
-          mtree-path: /data/col1/a001us043nve001
+          mtree-path: /data/col1/backupserver01
           quota:
               quota-soft-limit: 200 GiB
               quota-hard-limit: 250 GiB
 
+    - name: Enable NFS clients to connect
+      dellemc.datadomain.nfs:
+          state: enable
+        
     - name: Create an export, optionally add clients
       dellemc.datadomain.nfs:
           state: create
