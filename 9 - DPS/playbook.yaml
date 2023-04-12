@@ -51,11 +51,19 @@
           state: set
           operation: clean
           clean:
-              schedule: daily 3:00
+              schedule: 'daily 03:00'
 
     - name: Enable NFS clients to connect
       dellemc.datadomain.nfs:
           state: enable
+
+    - name: Create a MTree
+      dellemc.datadomain.mtree:
+          state: create
+          mtree-path: /data/col1/a001us043nve001
+          quota:
+              quota-soft-limit: 200 GiB
+              quota-hard-limit: 250 GiB
 
     - name: Create an export, optionally add clients
       dellemc.datadomain.nfs:
