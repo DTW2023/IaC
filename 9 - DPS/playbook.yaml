@@ -6,7 +6,7 @@
   vars:
     ansible_ssh_pass: "{{ lookup('env', 'VC_PASSWORD') }}"
     ansible_port: 22
-    ansible_user" sysadmin
+    ansible_user: sysadmin
 
 
   tasks:
