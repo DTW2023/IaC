@@ -31,6 +31,7 @@ done
 
 sleep 10
 echo Configure MetalLB 1
+# this yaml file contains the IP address ranges used by MetalLB
 kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/3%20-%20Kubernetes_Setup/support/metallb.yaml
 sleep 5
 
