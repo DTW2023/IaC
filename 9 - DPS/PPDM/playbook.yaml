@@ -1,4 +1,7 @@
 ---
+# Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
+# also check out https://github.com/dell/ansible-datadomain
+
 - name: "PowerProtect Data Manager stack deployment demo"
   hosts: localhost
   collections:

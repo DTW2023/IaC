@@ -1,4 +1,7 @@
 # Martin.Flint@dell.com
+
+# Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
+# also check out https://github.com/dell/ansible-datadomain
 - name: Data Domain Playbook.
   hosts: dd
   connection: local
