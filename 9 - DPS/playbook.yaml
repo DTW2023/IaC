@@ -110,8 +110,8 @@
     - name:  Add a new ddboost user
       dellemc.datadomain.users:
           state: add
-          user-name: "{{ ddbuser-name }}"
-          role-name: "{{ ddbrole-name }}"
+          user-name: "{{ ddbusername }}"
+          role-name: "{{ ddbrole }}"
           user-password: "{{ dd_password }}"
           dd-password: "{{ dd_password }}"
 
