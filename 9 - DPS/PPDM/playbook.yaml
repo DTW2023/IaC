@@ -1,0 +1,55 @@
+---
+- name: "PowerProtect Data Manager stack deployment demo"
+  hosts: localhost
+  collections:
+    - community.vmware
+  become: no
+  gather_facts: false
+ 
+  vars:
+  vars_files:
+    - credentials.yml
+
+  tasks:
+
+# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
+  - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
+    wait_for:
+      host: "{{ppdm_host}}.{{ad_domain}}"
+      port: 443
+      state: started
+      delay: 1
+      sleep: 60
+      timeout: 600
+    register: waitforppdm
+
+# AUTHENTICATE TO THE POWERPROTECT REST API & GRAB ACCESS TOKEN
+  - name: "( {{ppdm_host}} ): Authenticate to PowerProtect DM Rest API"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/login
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body:
+        username: "{{ppdm_id}}"
+        password: "{{ppdm_old_pwd}}"
+      status_code: 200
+    register: token
+    
+  - name:
+    debug:
+      var: token.json.access_token
+
+# LOGOUT OF THE REST API
+  - name: "( {{ppdm_host}}): Logout of the REST API"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/logout
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      status_code: 204
