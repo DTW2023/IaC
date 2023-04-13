@@ -356,7 +356,7 @@
     register: whitelist
 
 # ENABLE FILE SYSTEM AND MSSQL SERVER ASSET SOURCE
-  - name: "( {{ppdm_host}} ): Enable file system and mssql asset source"
+  - name: "( {{ppdm_host}} ): Enable file system and Kubernetes asset source"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING
       headers:
@@ -373,7 +373,7 @@
                   {
                       "name": "enabledAssetTypes",
                       "type": "LIST",
-                      "value": "VMWARE_VIRTUAL_MACHINE,MICROSOFT_SQL_DATABASE,FILE_SYSTEM,ORACLE_DATABASE"
+                      "value": "VMWARE_VIRTUAL_MACHINE,FILE_SYSTEM,KUBERNETES"
                   }
               ]
           }
