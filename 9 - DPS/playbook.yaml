@@ -44,12 +44,12 @@
       dellemc.datadomain.config:
         state: set
         option: location
-        location: 'Limerick-CSC' # This could be RACK location
+        location: "{{ rack_location }}" # This could be RACK location, no spaces accepted!!!!
 
     - name: Add time servers
       dellemc.datadomain.ntp:
           state: add
-          timeserver: 0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org
+          timeserver: "{{ ntp_servers }}"
 
     - name: enable the NTP local server
       dellemc.datadomain.ntp:
@@ -59,13 +59,13 @@
       dellemc.datadomain.config:
         state: set
         option: mailserver
-        mailserver: '10.204.20.2' # SMTP server IP/hostname
+        mailserver: "{{ smtp_server }}" # SMTP server IP/hostname
 
     - name: Set the timezone 
       dellemc.datadomain.config:
         state: set
         option: timezone
-        timezone: 'US/Eastern'
+        timezone: "{{ TZ }}"
 
     - name:  Create a filesystem on active tier storage
       dellemc.datadomain.filesys:
@@ -75,17 +75,17 @@
       dellemc.datadomain.filesys:
           state: enable
 
-    - name:  Set the Schedule
+    - name:  Set the Clean Schedule
       dellemc.datadomain.filesys:
           state: set
           operation: clean
           clean:
-              schedule: 'daily 03:00'
-
+              schedule: "{{ clean_sched }}"
+               
     - name: Create a MTree
       dellemc.datadomain.mtree:
           state: create
-          mtree-path: /data/col1/backupserver01
+          mtree-path: "{{ export_path }}"
           quota:
               quota-soft-limit: 200 GiB
               quota-hard-limit: 250 GiB
@@ -94,15 +94,14 @@
       dellemc.datadomain.nfs:
           state: enable
         
-    - name: Create an export, optionally add clients
+    - name: Create an export, and add clients
       dellemc.datadomain.nfs:
           state: create
-          export-name: backupserver01
-          path: /data/col1/backupserver01
-          clients: 10.204.20.0/24
-          options: 'rw,no_root_squash,no_all_squash,secure'
+          export-name: "{{ export_name }}"
+          path: "{{ export_path }}"
+          clients: "{{ client_network }}"
+          options: "{{ export_options }}"
           # Even if Path does not exists, nfs share will be created. So use MTree module to create it.
-
 
     - name: Enable ddboost
       dellemc.datadomain.ddboost:
@@ -111,16 +110,17 @@
     - name:  Add a new ddboost user
       dellemc.datadomain.users:
           state: add
-          user-name: dtw-boost
-          role-name: admin
+          user-name: "{{ ddbuser-name }}"
+          role-name: "{{ ddbrole-name }}"
           user-password: "{{ dd_password }}"
           dd-password: "{{ dd_password }}"
+
 
     - name: Create the ddboost storage unit
       dellemc.datadomain.ddboost:
           state: create
-          storage-unit: storage_unit-test
-          user-name: dtw-boost
+          storage-unit: "{{ ddstorage-unit }}"
+          user-name: "{{ dduser-name }}"
           ## Optional parameters
           quota:
               quota-soft-limit: 10 GiB
@@ -136,8 +136,5 @@
     - name: Assign the username to the ddboost protocol
       dellemc.datadomain.ddboost:
           state: assign
-          user-name: dtw-boost
-
-# enabel DDbost protocol
-# set passphrase?
+          user-name: "{{ ddbuser-name }}"
 
