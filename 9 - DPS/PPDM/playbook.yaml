@@ -1,4 +1,3 @@
-
 ---
 - name: "PowerProtect Data Manager stack deployment demo"
   hosts: localhost
@@ -13,10 +12,27 @@
 
   tasks:
 
+
+# DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
+    - name: "Deploy Virtual Machine  {{vmname}}"
+      vmware_guest:
+        hostname: "{{ vcenter_host }}"
+        username: "{{ vc_username }}"
+        password: "{{vc_password }}"
+        validate_certs: "{{ validate_certs }}"
+        name: "{{ vmname }}"
+        template: "{{ vm_template }}"
+        datacenter: "{{ vcenter_dc }}"
+        esxi_hostname: "{{ vcenter_esx }}"
+        folder: 'vm'
+        datastore: "{{ vcenter_ds }}"
+        state: poweredon
+
+
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
   - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
     wait_for:
-      host: "{{ppdm_host}}.{{ad_domain}}"
+      host: "{{ppdm_ip}}"
       port: 443
       state: started
       delay: 1
@@ -41,6 +57,10 @@
   - name:
     debug:
       var: token.json.access_token
+
+
+# Add stuff here!!!!!!!!!
+
 
 # LOGOUT OF THE REST API
   - name: "( {{ppdm_host}}): Logout of the REST API"
