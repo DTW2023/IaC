@@ -142,9 +142,6 @@
                   "dnsServers": [
                       "{{ppdm_dns}}"
                   ],
-                  "searchDomains": [
-                "{{ad_domain}}"
-            ],
                   "nslookupSuccess": true
               },
               {
