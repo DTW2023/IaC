@@ -16,20 +16,20 @@
   tasks:
 
 
-# DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
-    - name: "Deploy Virtual Machine  {{vmname}}"
-      vmware_guest:
-        hostname: "{{ vcenter_host }}"
-        username: "{{ vc_username }}"
-        password: "{{vc_password }}"
-        validate_certs: "{{ validate_certs }}"
-        name: "{{ vmname }}"
-        template: "{{ vm_template }}"
-        datacenter: "{{ vcenter_dc }}"
-        esxi_hostname: "{{ vcenter_esx }}"
-        folder: 'vm'
-        datastore: "{{ vcenter_ds }}"
-        state: poweredon
+# DEPLOY THE PPDM IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
+  - name: "Deploy Virtual Machine  {{vmname}}"
+    vmware_guest:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vc_username }}"
+      password: "{{vc_password }}"
+      validate_certs: "{{ validate_certs }}"
+      name: "{{ vmname }}"
+      template: "{{ vm_template }}"
+      datacenter: "{{ vcenter_dc }}"
+      esxi_hostname: "{{ vcenter_esx }}"
+      folder: 'vm'
+      datastore: "{{ vcenter_ds }}"
+      state: poweredon
 
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
