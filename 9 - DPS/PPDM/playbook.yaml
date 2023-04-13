@@ -127,80 +127,79 @@
       body_format: json
       body: |
           {
-            "id": "{{config.json.content[0].id}}",
-            "nodeId": "{{config.json.content[0].nodeId}}",
-               "networks": [
-                {
-                  "fqdn": "{{ppdm_host}}.{{ad_domain}}",
-                  "ipAddress": [
-                      "{{ppdm_ip}}"
-                  ],
-                  "ipAddressFamily": "{{config.json.content[0].networks[0].ipAddressFamily}}",
-                  "interfaceName": "{{config.json.content[0].networks[0].interfaceName}}",
-                  "netMask": "{{ppdm_netmask}}",
-                  "gateway": "{{ppdm_gateway}}",
-                  "dnsServers": [
-                      "{{ppdm_dns}}"
-                  ],
-                  "searchDomains": [
-                "{{ad_domain}}"
+    "id": "63fa58ba-a9d2-41ec-80b0-812dd888d909",
+    "nodeId": "23067661-b314-4855-a0e9-1867fda6ed83",
+    "networks": [
+        {
+            "fqdn": "ppdm-01.storage.local",
+            "ipAddress": [
+                "10.204.20.176"
             ],
-                  "nslookupSuccess": true
-              },
-              {
-                  "ipAddress": [
-                      "{{config.json.content[0].networks[1].ipAddress[0]}}"
-                  ],
-                  "ipAddressFamily": "{{config.json.content[0].networks[1].ipAddressFamily}}",
-                  "interfaceName": "{{config.json.content[0].networks[1].interfaceName}}",
-                  "netMask": "{{config.json.content[0].networks[1].netMask}}",
-                  "prefix": "{{config.json.content[0].networks[1].prefix}}",
-                  "ipAddressIpv6": [
-                      "{{config.json.content[0].networks[1].ipAddressIpv6[0]}}"
-                  ]
-              }
-          ],
-            "ntpServers": [
-                "{{ppdm_ntp}}"
+            "ipAddressFamily": "IPv4",
+            "interfaceName": "eth0",
+            "netMask": "255.255.255.0",
+            "gateway": "10.204.20.1",
+            "dnsServers": [
+                "10.204.20.2"
             ],
-            "timeZone": "{{ppdm_timezone}}",
-            "osUsers": [
-                {
-                    "userName": "root",
-                    "description": "OS root user account",
-                    "numberOfDaysToExpire": 60,
-                    "password": "changeme",
-                    "newPassword": "{{ppdm_pwd}}"
-                },
-                {
-                    "userName": "admin",
-                    "description": "OS administrator user account",
-                    "numberOfDaysToExpire": 60,
-                    "password": "@ppAdm1n",
-                    "newPassword": "{{ppdm_pwd}}"
-                },
-                {
-                    "userName": "support",
-                    "description": "OS support user account",
-                    "numberOfDaysToExpire": 60,
-                    "password": "$upp0rt!",
-                    "newPassword": "{{ppdm_pwd}}"
-                }
+            "searchDomains": [
+                "storage.local"
             ],
-            "lockbox": {
-                "name": "Lockbox",
-                "lastUpdatedTime": "{{config.json.content[0].lockbox.lastUpdatedTime}}",
-                "passphrase": "Ch@ngeme1",
-                "newPassphrase": "{{ppdm_pwd}}"
-            },
-            "configType": "standalone",
-            "gettingStartedCompleted": false,
-            "autoSupport": false,
-            "integratedStorageSecuritySetupCompleted": false,
-            "deployedPlatform": "VMWARE",
-            "applicationUserPassword": "{{ppdm_pwd}}"
-          }
-      status_code: 202
+            "nslookupSuccess": false
+        },
+        {
+            "ipAddress": [
+                "172.24.0.193"
+            ],
+            "ipAddressFamily": "Dual",
+            "interfaceName": "brpp0",
+            "netMask": "255.255.255.192",
+            "prefix": "120",
+            "ipAddressIpv6": [
+                "fdc9:7233:0000:0000:0000:0000:0000:0001"
+            ]
+        },
+        {
+            "ipAddressFamily": "IPv6",
+            "interfaceName": "vethc1936c4"
+        }
+    ],
+    "ntpServers": [],
+    "timeZone": "PST8PDT - Pacific Standard Time",
+    "osUsers": [
+        {
+            "userName": "root",
+            "description": "OS root user account",
+            "numberOfDaysToExpire": 60,
+            "expirationDays": 60,
+            "remainingExpirationDays": 60
+        },
+        {
+            "userName": "admin",
+            "description": "OS administrator user account",
+            "numberOfDaysToExpire": 60,
+            "expirationDays": 60,
+            "remainingExpirationDays": 60
+        },
+        {
+            "userName": "support",
+            "description": "OS support user account",
+            "numberOfDaysToExpire": 60,
+            "expirationDays": 60,
+            "remainingExpirationDays": 60
+        }
+    ],
+    "lockbox": {
+        "name": "Lockbox",
+        "lastUpdatedTime": "2023-04-13T22:30:55.919+00:00"
+    },
+    "configType": "standalone",
+    "gettingStartedCompleted": false,
+    "autoSupport": false,
+    "integratedStorageSecuritySetupCompleted": false,
+    "deployedPlatform": "VMWARE"
+        }
+    status_code: 202
     register: start_config
 
 # PAUSE THE PLAY FOR 1 MINUTE (BUG in 19.12 INVALIDATES THE TOKEN SO WE WAIT THEN REAUTHENTICATE TO WORK AROUND THE ISSUE)
