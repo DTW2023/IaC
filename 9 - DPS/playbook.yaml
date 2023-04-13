@@ -36,44 +36,44 @@
       register: waitforddve
 
 # AUTHENTICATE TO DDVE REST API
-  - name: "( {{ddve_ip}} ): Authenticate to PowerProtect DD REST API"
-    uri:
-      url: https://{{ddve_ip}}:3009/rest/v1.0/auth
-      method: POST
-      force_basic_auth: no
-      validate_certs: no
-      return_content: yes
-      body_format: json
-      body: |
-        {
-          "username": "sysadmin",
-          "password": "{{dd_password}}"
-        }
-      status_code: 201
-    register: dd_token
+    - name: "( {{ddve_ip}} ): Authenticate to PowerProtect DD REST API"
+      uri:
+        url: https://{{ddve_ip}}:3009/rest/v1.0/auth
+        method: POST
+        force_basic_auth: no
+        validate_certs: no
+        return_content: yes
+        body_format: json
+        body: |
+          {
+            "username": "sysadmin",
+            "password": "{{dd_password}}"
+          }
+        status_code: 201
+      register: dd_token
 
 
 # SET THE SYSTEM PASSPHRASE
-  - name: "( {{ddve_ip}} ): Set the system passphrase"
-    uri:
-      url: https://{{ddve_ip}}:3009/rest/v3.0/dd-systems/0/systems
-      method: PUT
-      headers:
-        X-DD-AUTH-TOKEN: "{{dd_token.x_dd_auth_token}}"
-        Content-Type: "application/json"
-      force_basic_auth: no
-      validate_certs: no
-      body_format: json
-      body: |
-        {
-          "operation": "set_pphrase",
-          "pphrase_request": {
-            "new_pphrase": "{{dd_password}}"
+    - name: "( {{ddve_ip}} ): Set the system passphrase"
+      uri:
+        url: https://{{ddve_ip}}:3009/rest/v3.0/dd-systems/0/systems
+        method: PUT
+        headers:
+          X-DD-AUTH-TOKEN: "{{dd_token.x_dd_auth_token}}"
+          Content-Type: "application/json"
+        force_basic_auth: no
+        validate_certs: no
+        body_format: json
+        body: |
+          {
+            "operation": "set_pphrase",
+            "pphrase_request": {
+              "new_pphrase": "{{dd_password}}"
+            }
           }
-        }
-      return_content: yes
-      status_code: 200
-    register: passphrase
+        return_content: yes
+        status_code: 200
+      register: passphrase
 
 
     - name: Set email address for alerts, detailed-autosupport and daily alert summary emails
