@@ -119,8 +119,8 @@
     - name: Create the ddboost storage unit
       dellemc.datadomain.ddboost:
           state: create
-          storage-unit: "{{ ddstorage-unit }}"
-          user-name: "{{ dduser-name }}"
+          storage-unit: "{{ ddstorage_unit }}"
+          user-name: "{{ ddbusername }}"
           ## Optional parameters
           quota:
               quota-soft-limit: 10 GiB
@@ -136,5 +136,5 @@
     - name: Assign the username to the ddboost protocol
       dellemc.datadomain.ddboost:
           state: assign
-          user-name: "{{ ddbuser-name }}"
+          user-name: "{{ ddbusername }}"
 
