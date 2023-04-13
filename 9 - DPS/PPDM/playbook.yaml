@@ -1,3 +1,4 @@
+
 ---
 - name: "PowerProtect Data Manager stack deployment demo"
   hosts: localhost
@@ -5,14 +6,14 @@
     - community.vmware
   become: no
   gather_facts: false
- 
+
   vars:
   vars_files:
-    - credentials.yml
+    - credentials.yaml
 
   tasks:
 
-# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
+# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
   - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
     wait_for:
       host: "{{ppdm_host}}.{{ad_domain}}"
@@ -32,11 +33,11 @@
       return_content: yes
       body_format: json
       body:
-        username: "{{ppdm_id}}"
+        username: "{{ ppdm_id }}"
         password: "{{ppdm_old_pwd}}"
       status_code: 200
     register: token
-    
+
   - name:
     debug:
       var: token.json.access_token
