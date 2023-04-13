@@ -38,7 +38,7 @@
       dellemc.datadomain.config:
         state: set
         option: admin-email
-        admin-email: "{{ email }}"
+        admin-email: "{{ admin_email }}"
 
     - name: Set the location
       dellemc.datadomain.config:
