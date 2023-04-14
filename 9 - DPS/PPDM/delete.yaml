@@ -1,0 +1,33 @@
+---
+# Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
+# also check out https://github.com/dell/ansible-datadomain
+
+- name: "PowerProtect Data Manager stack deployment demo"
+  hosts: localhost
+  collections:
+    - community.vmware
+  become: no
+  gather_facts: false
+
+  vars:
+  vars_files:
+    - credentials.yaml
+
+  tasks:
+
+
+# DEPLOY THE PPDM IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
+  - name: "Deploy Virtual Machine  {{vmname}}"
+    vmware_guest:
+      hostname: "{{ vcenter_host }}"
+      username: "{{ vc_username }}"
+      password: "{{vc_password }}"
+      validate_certs: "{{ validate_certs }}"
+      name: "{{ vmname }}"
+      template: "{{ vm_template }}"
+      datacenter: "{{ vcenter_dc }}"
+      esxi_hostname: "{{ vcenter_esx }}"
+      folder: 'vm'
+      datastore: "{{ vcenter_ds }}"
+      force: yes
+      state: absent
