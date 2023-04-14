@@ -8,9 +8,16 @@
 
   tasks: 
  
-
-
   - name: Deploy Kubernetes Dashboard 
     when: inventory_hostname in groups['k8s_master']
-    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Fun/mc/minecraft.yaml"
+    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Fun/db/dashboard.yaml"
 
+  - name: Create Service Account for Kubernetes Dashboard 
+    when: inventory_hostname in groups['k8s_master']
+    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Fun/db/admin-user.yaml"
+
+  - name: run commmand
+    when: inventory_hostname in groups['k8s_master']
+    debug:
+      msg: run command 'kubectl -n kubernetes-dashboard create token admin-user' then goto https://10.204.20.175/
+    delegate_to: localhost

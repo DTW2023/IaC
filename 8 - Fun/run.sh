@@ -6,3 +6,10 @@ cd ../qk
 echo Deploying Quake - connect at http://10.204.20.174
 ansible-playbook -i inventory playbook.yaml
 cd ..
+echo Deploying Kubernetes DB - connect at http://10.204.20.175
+cd db
+ansible-playbook -i inv playbook.yaml
+echo run command kubectl -n kubernetes-dashboard create token admin-user
+cd ..
+
+
