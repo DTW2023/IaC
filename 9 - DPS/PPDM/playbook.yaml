@@ -206,6 +206,22 @@
     ansible.builtin.pause:
       minutes: 1
   
+# Create a Service Account for PPDM
+ - name: Create Service Account for PPDM
+    kubernetes.core.k8s:
+      state: present
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/PPDM/ppdm-user.yaml
+
+# Generate Token for PPDM User
+  - name: get token
+    command: "kubectl -n kubernetes-dashboard create token ppdm-user"
+    register: ppdm_token
+
+# Show the token, this wiill be used to configure PPDM
+  - name: Display Token
+    debug:
+      var: ppdm_token.stdout_lines[0]
+
 # REAUTHENTICATE AND GRAB A NEW TOKEN
   - name: "( {{ppdm_host}} ): Re-authenticate to PowerProtect DM Rest API"
     uri:
