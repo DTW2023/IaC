@@ -36,6 +36,9 @@ cd ..
 
 end=`date +%s`
 
+# delete /root/.kube
+rm -rf /root/.kube
+
 echo -n "Finished "
 date
 runtime=$((end-start))
