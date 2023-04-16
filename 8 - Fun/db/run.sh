@@ -1,1 +1,1 @@
-ansible-playbook -i inv playbook.yaml
+ansible-playbook playbook.yaml

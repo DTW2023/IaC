@@ -280,6 +280,20 @@
       path: /tmp/helm.tgz
       state: absent
 
+  - name: Create /root/.kube directory
+    when: inventory_hostname in groups['k8s_master']
+    file:
+      path: /root/.kube
+      state: directory
+    delegate_to: localhost
+
+  - name: Copy /root/.kube/config to ansible server
+    when: inventory_hostname in groups['k8s_master']
+    ansible.builtin.fetch:
+      flat: true
+      src: /root/.kube/config
+      dest: /root/.kube/config
+
   - name: Pause for 60 seconds and wait for everyting to stablize
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.pause:
