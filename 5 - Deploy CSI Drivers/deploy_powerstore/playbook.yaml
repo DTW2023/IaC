@@ -217,6 +217,11 @@
       path: /tmp/SC.yaml
       state: absent
 
+
+  - name: Create a VolumeSnapshotClass for PowerStore
+    when: inventory_hostname in groups['k8s_master']
+    command: "kubectl create -f /tmp/SC.yaml"
+
   - name: Pause for 30 seconds and wait for everyting to stablize
     when: inventory_hostname in groups['k8s_master']
     ansible.builtin.pause:
