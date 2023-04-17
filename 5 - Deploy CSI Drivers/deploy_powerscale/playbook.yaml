@@ -454,7 +454,7 @@
 
   - name: Create a VolumeSnapshotClass for PowerScale
     when: inventory_hostname in groups['k8s_master']
-    command: "kubectl create -f https://raw.githubusercontent.com/DTW2023/IaC/main/5%20-%20Deploy%20CSI%20Drivers/deploy_powerstore/powerstore-volumesnapclass.yaml"
+    command: "kubectl create -f https://raw.githubusercontent.com/DTW2023/IaC/main/5%20-%20Deploy%20CSI%20Drivers/deploy_powerscale/powerscale-volumesnapclass.yaml"
 
 
   - name: Pause for 30 seconds and wait for everyting to stablize
