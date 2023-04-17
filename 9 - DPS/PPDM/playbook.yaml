@@ -114,7 +114,7 @@
     debug:
       var: config.json.content[0].id
 
-# START THE INITIAL CONFIGURATION
+# START THE INITIAL CONFIGURATION 19.13
   - name: "( {{ppdm_host}} ): Start the initial PowerProtect configuration - {{config.json.content[0].id}}"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/configurations/{{config.json.content[0].id}}
@@ -129,8 +129,7 @@
           {
             "id": "{{config.json.content[0].id}}",
             "nodeId": "{{config.json.content[0].nodeId}}",
-            "applicationUserPassword": "{{ppdm_pwd}}",
-               "networks": [
+              "networks": [
                 {
                   "fqdn": "{{ppdm_host}}.{{ad_domain}}",
                   "ipAddress": [
@@ -142,6 +141,9 @@
                   "gateway": "{{ppdm_gateway}}",
                   "dnsServers": [
                       "{{ppdm_dns}}"
+                  ],
+                  "searchDomains": [
+                    "vcorp.local"
                   ],
                   "nslookupSuccess": true
               },
@@ -167,6 +169,8 @@
                     "userName": "root",
                     "description": "OS root user account",
                     "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
                     "password": "changeme",
                     "newPassword": "{{ppdm_pwd}}"
                 },
@@ -174,6 +178,8 @@
                     "userName": "admin",
                     "description": "OS administrator user account",
                     "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
                     "password": "@ppAdm1n",
                     "newPassword": "{{ppdm_pwd}}"
                 },
@@ -181,6 +187,8 @@
                     "userName": "support",
                     "description": "OS support user account",
                     "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
                     "password": "$upp0rt!",
                     "newPassword": "{{ppdm_pwd}}"
                 }
@@ -200,6 +208,7 @@
           }
       status_code: 202
     register: start_config
+
 
 # PAUSE THE PLAY FOR 1 MINUTE (BUG in 19.12 INVALIDATES THE TOKEN SO WE WAIT THEN REAUTHENTICATE TO WORK AROUND THE ISSUE)
   - name: Wait for 1 minute then try to re-authenticate
