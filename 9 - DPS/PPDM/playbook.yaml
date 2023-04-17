@@ -612,6 +612,13 @@
 # Add stuff here!!!!!!!!!
 
 
+# once kubernetes sources added
+# Create a Service Account for PPDM
+ - name: Create ppdm-snapshot-storage-class-mapping configmap in namespace powerprotect
+    kubernetes.core.k8s:
+      state: present
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/PPDM/snapshot-configmap
+
 # LOGOUT OF THE REST API
   - name: "( {{ppdm_host}}): Logout of the REST API"
     uri:
