@@ -3,10 +3,10 @@ apiVersion: v1
 kind: ConfigMap
 data:
   powerscale-snapshots: powerscale
-  powerstore-snapshots: powerstore-ext3
-  powerstore-snapshots: powerstore-ext4
-  powerstore-snapshots: powerstore-nfs
-  powerstore-snapshots: powerstore-xfs
+  powerstore-snapshots-ext3: powerstore-ext3
+  powerstore-snapshots-ext4: powerstore-ext4
+  powerstore-snapshots-nfs: powerstore-nfs
+  powerstore-snapshots-xfs: powerstore-xfs
 metadata:
   name: ppdm-snapshot-storage-class-mapping
   namespace: powerprotect

@@ -1,7 +1,52 @@
 apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:
-  name: powerstore-snapshots
+  name:  powerstore-snapshots-ext3
+driver: csi-powerstore.dellemc.com
+# Configure what happens to a VolumeSnapshotContent when the VolumeSnapshot object
+# it is bound to is to be deleted
+# Allowed values:
+#   Delete: the underlying storage snapshot will be deleted along with the VolumeSnapshotContent object.
+#   Retain: both the underlying snapshot and VolumeSnapshotContent remain.
+# Default value: None
+# Optional: false
+# Examples: Delete
+deletionPolicy: Delete
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name:  powerstore-snapshots-ext4
+driver: csi-powerstore.dellemc.com
+# Configure what happens to a VolumeSnapshotContent when the VolumeSnapshot object
+# it is bound to is to be deleted
+# Allowed values:
+#   Delete: the underlying storage snapshot will be deleted along with the VolumeSnapshotContent object.
+#   Retain: both the underlying snapshot and VolumeSnapshotContent remain.
+# Default value: None
+# Optional: false
+# Examples: Delete
+deletionPolicy: Delete
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name:  powerstore-snapshots-xfs
+driver: csi-powerstore.dellemc.com
+# Configure what happens to a VolumeSnapshotContent when the VolumeSnapshot object
+# it is bound to is to be deleted
+# Allowed values:
+#   Delete: the underlying storage snapshot will be deleted along with the VolumeSnapshotContent object.
+#   Retain: both the underlying snapshot and VolumeSnapshotContent remain.
+# Default value: None
+# Optional: false
+# Examples: Delete
+deletionPolicy: Delete
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name:  powerstore-snapshots-nfs
 driver: csi-powerstore.dellemc.com
 # Configure what happens to a VolumeSnapshotContent when the VolumeSnapshot object
 # it is bound to is to be deleted
