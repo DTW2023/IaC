@@ -20,11 +20,6 @@
         path: //tmp/CSM-OB.sh
         state: absent
 
-#    - name: Pause for "{{ app_pause_secs }}" seconds to build app
-#      ansible.builtin.pause:
-#        seconds: "{{ app_pause_secs }}"
-
-
 # WAIT FOR HTTP RESPONSE FROM Grafana
     - name: "Waiting for HTTP connectivity."
       wait_for:
