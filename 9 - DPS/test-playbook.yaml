@@ -82,7 +82,7 @@
 # START THE INITIAL CONFIGURATION
   - name: "( {{ppdm_host}} ): Start the initial PowerProtect configuration - {{config.json.content[0].id}}"
     uri:
-      url: https://{{ppdm_host}}:8443/api/v2/configurations/{{config.json.content[0].id}}
+      url: https://{{ppdm_host}}:8443/api/v2/configurations/2f5d9a15-26bd-43c0-a94a-79351736aec5
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
