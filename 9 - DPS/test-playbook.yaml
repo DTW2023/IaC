@@ -14,7 +14,7 @@
     - credentials.yaml
 
   tasks:
-  
+
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
   - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
     wait_for:
@@ -91,44 +91,46 @@
       return_content: yes
       body_format: json
       body: |
-          {
-            "id": "{{config.json.content[0].id}}",
-            "nodeId": "{{config.json.content[0].nodeId}}",
-               "networks": [
+         {
+            "id": "2f5d9a15-26bd-43c0-a94a-79351736aec5",
+            "nodeId": "fad24ae6-2f13-456e-bc28-0d6225fa8fe0",
+            "networks": [
                 {
-                  "fqdn": "{{ppdm_host}}.{{ad_domain}}",
-                  "ipAddress": [
-                      "{{ppdm_ip}}"
-                  ],
-                  "ipAddressFamily": "{{config.json.content[0].networks[0].ipAddressFamily}}",
-                  "interfaceName": "{{config.json.content[0].networks[0].interfaceName}}",
-                  "netMask": "{{ppdm_netmask}}",
-                  "gateway": "{{ppdm_gateway}}",
-                  "dnsServers": [
-                      "{{ppdm_dns}}"
-                  ],
-                  "searchDomains": [
-                        "{{config.json.content[0].searchDomains[0]}}"
+                    "fqdn": "ppdm-01.storage.local",
+                    "ipAddress": [
+                        "10.204.20.176"
                     ],
-                  "nslookupSuccess": true
-              },
-              {
-                  "ipAddress": [
-                      "{{config.json.content[0].networks[1].ipAddress[0]}}"
-                  ],
-                  "ipAddressFamily": "{{config.json.content[0].networks[1].ipAddressFamily}}",
-                  "interfaceName": "{{config.json.content[0].networks[1].interfaceName}}",
-                  "netMask": "{{config.json.content[0].networks[1].netMask}}",
-                  "prefix": "{{config.json.content[0].networks[1].prefix}}",
-                  "ipAddressIpv6": [
-                      "{{config.json.content[0].networks[1].ipAddressIpv6[0]}}"
-                  ]
-              }
-          ],
-            "ntpServers": [
-                "{{ppdm_ntp}}"
+                    "ipAddressFamily": "IPv4",
+                    "interfaceName": "eth0",
+                    "netMask": "255.255.255.0",
+                    "gateway": "10.204.20.1",
+                    "dnsServers": [
+                        "10.204.20.2"
+                    ],
+                    "searchDomains": [
+                        "storage.local"
+                    ],
+                    "nslookupSuccess": true
+                },
+                {
+                    "ipAddress": [
+                        "172.24.0.193"
+                    ],
+                    "ipAddressFamily": "Dual",
+                    "interfaceName": "brpp0",
+                    "netMask": "255.255.255.192",
+                    "prefix": "120",
+                    "ipAddressIpv6": [
+                        "fdc9:7233:0000:0000:0000:0000:0000:0001"
+                    ]
+                },
+                {
+                    "ipAddressFamily": "IPv6",
+                    "interfaceName": "vethd334658"
+                }
             ],
-            "timeZone": "{{ppdm_timezone}}",
+            "ntpServers": ["0.pool.ntp.org"],
+            "timeZone": "PST8PDT - Pacific Standard Time",
             "osUsers": [
                 {
                     "userName": "root",
@@ -137,7 +139,7 @@
                     "expirationDays": 60,
                     "remainingExpirationDays": 60,
                     "password": "changeme",
-                    "newPassword": "{{ppdm_pwd}}"
+                    "newPassword": "Password01!"
                 },
                 {
                     "userName": "admin",
@@ -146,7 +148,7 @@
                     "expirationDays": 60,
                     "remainingExpirationDays": 60,
                     "password": "@ppAdm1n",
-                    "newPassword": "{{ppdm_pwd}}"
+                    "newPassword": "Password01!"
                 },
                 {
                     "userName": "support",
@@ -154,25 +156,107 @@
                     "numberOfDaysToExpire": 60,
                     "expirationDays": 60,
                     "remainingExpirationDays": 60,
-                    "password": "$upp0rt!",
-                    "newPassword": "{{ppdm_pwd}}"
+                     "password": "$upp0rt!",
+                     "newPassword": "Password01!"
                 }
             ],
             "lockbox": {
                 "name": "Lockbox",
-                "lastUpdatedTime": "{{config.json.content[0].lockbox.lastUpdatedTime}}",
+                "lastUpdatedTime": "2023-04-18T15:20:52.989+00:00",
                 "passphrase": "Ch@ngeme1",
-                "newPassphrase": "{{ppdm_pwd}}"
+                "newPassphrase": "Password01!"
             },
             "configType": "standalone",
             "gettingStartedCompleted": false,
             "autoSupport": false,
             "integratedStorageSecuritySetupCompleted": false,
             "deployedPlatform": "VMWARE",
-            "applicationUserPassword": "{{ppdm_pwd}}"
+            "applicationUserPassword": "Password01!"
           }
+          
       status_code: 202
     register: start_config
+
+# {
+          #   "id": "{{config.json.content[0].id}}",
+          #   "nodeId": "{{config.json.content[0].nodeId}}",
+          #      "networks": [
+          #       {
+          #         "fqdn": "{{ppdm_host}}.{{ad_domain}}",
+          #         "ipAddress": [
+          #             "{{ppdm_ip}}"
+          #         ],
+          #         "ipAddressFamily": "{{config.json.content[0].networks[0].ipAddressFamily}}",
+          #         "interfaceName": "{{config.json.content[0].networks[0].interfaceName}}",
+          #         "netMask": "{{ppdm_netmask}}",
+          #         "gateway": "{{ppdm_gateway}}",
+          #         "dnsServers": [
+          #             "{{ppdm_dns}}"
+          #         ],
+          #         "searchDomains": [
+          #               "{{config.json.content[0].networks[0].searchDomains[0]}}"
+          #           ],
+          #         "nslookupSuccess": true
+          #     },
+          #     {
+          #         "ipAddress": [
+          #             "{{config.json.content[0].networks[1].ipAddress[0]}}"
+          #         ],
+          #         "ipAddressFamily": "{{config.json.content[0].networks[1].ipAddressFamily}}",
+          #         "interfaceName": "{{config.json.content[0].networks[1].interfaceName}}",
+          #         "netMask": "{{config.json.content[0].networks[1].netMask}}",
+          #         "prefix": "{{config.json.content[0].networks[1].prefix}}",
+          #         "ipAddressIpv6": [
+          #             "{{config.json.content[0].networks[1].ipAddressIpv6[0]}}"
+          #         ]
+          #     }
+          # ],
+          #   "ntpServers": [
+          #       "{{ppdm_ntp}}"
+          #   ],
+          #   "timeZone": "{{ppdm_timezone}}",
+          #   "osUsers": [
+          #       {
+          #           "userName": "root",
+          #           "description": "OS root user account",
+          #           "numberOfDaysToExpire": 60,
+          #           "expirationDays": 60,
+          #           "remainingExpirationDays": 60,
+          #           "password": "changeme",
+          #           "newPassword": "{{ppdm_pwd}}"
+          #       },
+          #       {
+          #           "userName": "admin",
+          #           "description": "OS administrator user account",
+          #           "numberOfDaysToExpire": 60,
+          #           "expirationDays": 60,
+          #           "remainingExpirationDays": 60,
+          #           "password": "@ppAdm1n",
+          #           "newPassword": "{{ppdm_pwd}}"
+          #       },
+          #       {
+          #           "userName": "support",
+          #           "description": "OS support user account",
+          #           "numberOfDaysToExpire": 60,
+          #           "expirationDays": 60,
+          #           "remainingExpirationDays": 60,
+          #           "password": "$upp0rt!",
+          #           "newPassword": "{{ppdm_pwd}}"
+          #       }
+          #   ],
+          #   "lockbox": {
+          #       "name": "Lockbox",
+          #       "lastUpdatedTime": "{{config.json.content[0].lockbox.lastUpdatedTime}}",
+          #       "passphrase": "Ch@ngeme1",
+          #       "newPassphrase": "{{ppdm_pwd}}"
+          #   },
+          #   "configType": "standalone",
+          #   "gettingStartedCompleted": false,
+          #   "autoSupport": false,
+          #   "integratedStorageSecuritySetupCompleted": false,
+          #   "deployedPlatform": "VMWARE",
+          #   "applicationUserPassword": "{{ppdm_pwd}}"
+          # }
 
 # PAUSE THE PLAY FOR 1 MINUTE (BUG in 19.12 INVALIDATES THE TOKEN SO WE WAIT THEN REAUTHENTICATE TO WORK AROUND THE ISSUE)
   - name: Wait for 1 minute then try to re-authenticate
