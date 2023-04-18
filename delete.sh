@@ -11,7 +11,7 @@ ansible-playbook -i inventory delete.yaml
 cd ../..
 
 echo delete fio workloads
-cd "7 - Generate Load"
+cd "8 - Generate Load"
 cd powerstore
 echo powerstore
 ansible-playbook -i inventory delete.yaml
