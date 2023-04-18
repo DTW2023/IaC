@@ -104,24 +104,23 @@
     debug:
       var: ppdm_token.stdout_lines[0]
 
-  - name: remove /tmp/ppdm-scripts
-    ansible.builtin.file:
-      path: /tmp/ppdm-scripts
-      state: absent
+#  - name: remove /tmp/ppdm-scripts
+#    ansible.builtin.file:
+#      path: /tmp/ppdm-scripts
+#      state: absent
+#
+#  - name: Create a directory /tmp/ppdm-scripts
+#    ansible.builtin.file:
+#      path: /tmp/ppdm-scripts
+#      state: directory
+#      mode: '0755'
+#
+#  - name: download scripts
+#    shell:
+#      cmd: "git clone https://github.com/dell/powerprotect-data-manager.git"
+#      chdir: /tmp/ppdm-scripts
 
-  - name: Create a directory /tmp/ppdm-scripts
-    ansible.builtin.file:
-      path: /tmp/ppdm-scripts
-      state: directory
-      mode: '0755'
-
-
-  - name: download scripts
-    shell:
-      cmd: "git clone https://github.com/dell/powerprotect-data-manager.git"
-      chdir: /tmp/ppdm-scripts
-
-  - name: "Set Upload Credentials for {{ cluster_ip }} on {{ vmname }}"
+  - name: "Set Credentials for {{ cluster_ip }} on {{ vmname }}"
     uri:
       url: "https://{{ ppdm_ip }}:8443/api/v2/credentials"
       headers:
