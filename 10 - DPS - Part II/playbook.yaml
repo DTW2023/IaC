@@ -2,7 +2,7 @@
 # Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
 # also check out https://github.com/dell/ansible-datadomain
 
-- name: "PowerProtect Data Domain & Data Manager stack deployment demo"
+- name: "Configure PPDM to Backup minecraft namespace and Virtual Machines master, worker-01, worker-02, worker-03"
   hosts: localhost
   collections:
     - community.vmware
@@ -16,21 +16,6 @@
   tasks:
 
 
-# DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
-  - name: "Deploy Virtual Machine  {{ddvmname}}"
-    vmware_guest:
-       hostname: "{{ vcenter_host }}"
-       username: "{{ vc_username }}"
-       password: "{{ vc_password }}"
-       validate_certs: "{{ validate_certs }}"
-       name: "{{ ddvmname }}"
-       template: "{{ ddvm_template }}"
-       datacenter: "{{ vcenter_dc }}"
-       esxi_hostname: "{{ vcenter_esx }}"
-       folder: 'vm'
-       datastore: "{{ vcenter_ds }}"
-       state: poweredon
-
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
   - name: " {{ddvmname}} - Waiting for HTTPS connectivity."
     wait_for:
@@ -42,21 +27,6 @@
       timeout: 600
     register: waitforddve
 
-
-# DEPLOY THE PPDM IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
-  - name: "Deploy Virtual Machine  {{vmname}}"
-    vmware_guest:
-       hostname: "{{ vcenter_host }}"
-       username: "{{ vc_username }}"
-       password: "{{ vc_password }}"
-       validate_certs: "{{ validate_certs }}"
-       name: "{{ vmname }}"
-       template: "{{ vm_template }}"
-       datacenter: "{{ vcenter_dc }}"
-       esxi_hostname: "{{ vcenter_esx }}"
-       folder: 'vm'
-       datastore: "{{ vcenter_ds }}"
-       state: poweredon
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
   - name: "( {{ppdm_ip}} ): Wait for HTTPS connectivity"
