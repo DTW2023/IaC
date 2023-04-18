@@ -38,10 +38,7 @@
       sleep: 60
       timeout: 600
     register: waitforppdm
-
-  - name: Pause for 180 seconds and wait for everyting to stablize
-    ansible.builtin.pause:
-      seconds: 180
+    
 
 # AUTHENTICATE TO THE POWERPROTECT REST API & GRAB ACCESS TOKEN
   - name: "( {{ppdm_ip}} ): Authenticate to PowerProtect DM Rest API"
