@@ -43,7 +43,7 @@
     register: waitforddve
 
 
-# DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
+# DEPLOY THE PPDM IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
   - name: "Deploy Virtual Machine  {{vmname}}"
     vmware_guest:
        hostname: "{{ vcenter_host }}"
@@ -57,10 +57,6 @@
        folder: 'vm'
        datastore: "{{ vcenter_ds }}"
        state: poweredon
-
-  - name: Pause for 180 seconds and wait for everyting to stablize
-    ansible.builtin.pause:
-      seconds: 180
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
   - name: "( {{ppdm_ip}} ): Wait for HTTPS connectivity"
@@ -118,22 +114,6 @@
   - name: Display Token
     debug:
       var: ppdm_token.stdout_lines[0]
-
-#  - name: remove /tmp/ppdm-scripts
-#    ansible.builtin.file:
-#      path: /tmp/ppdm-scripts
-#      state: absent
-#
-#  - name: Create a directory /tmp/ppdm-scripts
-#    ansible.builtin.file:
-#      path: /tmp/ppdm-scripts
-#      state: directory
-#      mode: '0755'
-#
-#  - name: download scripts
-#    shell:
-#      cmd: "git clone https://github.com/dell/powerprotect-data-manager.git"
-#      chdir: /tmp/ppdm-scripts
 
   - name: "Add Credentials for Cluster {{ cluster_ip }} on {{ vmname }}"
     uri:
