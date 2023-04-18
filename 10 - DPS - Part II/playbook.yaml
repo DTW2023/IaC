@@ -65,11 +65,11 @@
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
-      method: POST
+      method: PUT
       validate_certs: no
       return_content: yes
       body_format: json
-      status_code: 201
+      status_code: 200
       body: |
         {
           "id": "ASSET_SETTING",
