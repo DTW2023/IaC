@@ -1,0 +1,32 @@
+---
+# MISC VARIABLES
+ad_domain: storage.local
+artifact_path: /var/images
+
+# # POWERPROTECT DD VARIABLES
+ppdd_host: ddve-01
+ppdd_id: sysadmin
+ppdd_pwd: Password01!
+ppdd_ip: 10.204.20.154
+
+# POWERPROTECT DATA MANAGER VARIABLES
+ppdm_host: ppdm-01
+ppdm_id: admin
+ppdm_old_pwd: admin
+ppdm_pwd: Password01!
+ppdm_ip: 10.204.20.176
+ppdm_netmask: 255.255.255.0
+ppdm_gateway: 10.204.20.1
+ppdm_dns: 20.204.20.2
+ppdm_timezone: "US/Eastern - Eastern Standard Time"
+ppdm_ova: dellemc-ppdm-sw-19.13.0-20.ova
+
+# VCENTER VARIABLES
+vcenter_id: administrator@vsphere.local
+vcenter_pwd: Password01!
+vcenter_host: 10.204.20.27
+vcenter_esx: dc3strshow01.storage.local
+vcenter_dc: DC3STRLIM
+vcenter_ds: IAC_DTW2023
+vcenter_cluster: MetroCluster
+vcenter_network: vLAN260
