@@ -88,6 +88,14 @@
     debug:
       var: token.json.access_token
 
+# create ppdm namespace
+  - name: Create a k8s namespace
+    kubernetes.core.k8s:
+      name: ppdm
+      api_version: v1
+      kind: Namespace
+      state: present
+
 # Create a Service Account for PPDM
   - name: Create Service Account for PPDM
     kubernetes.core.k8s:
