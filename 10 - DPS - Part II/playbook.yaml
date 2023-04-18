@@ -153,19 +153,22 @@
     debug:
       var: kube_cert.json[0].fingerprint
 
+
+
+
     
-  - name: "( {{ ppdm_ip }} ): Accept Cert for Kubernetes cluster {{ cluster_ip }}"
-    uri:
-      url: "https://{{ ppdm_ip }}:8443/api/v2/certificates/{{ kube_cert.json[0].id }}"
-      headers:
-        Authorization: "Bearer {{token.json.access_token}}"
-        Content-Type: "application/json"
-      method: PUT
-      validate_certs: no
-      return_content: yes
-      body_format: json
-      body: |
-         {"fingerprint":"{{ kube_cert.json[0].fingerprint }}","host":"{{ cluster_ip }}","id":"{{ kube_cert.json[0].id }}","issuerName":"CN=kubernetes","notValidAfter":"Tue Apr 16 22:40:50 EDT 2024","notValidBefore":"Mon Apr 17 22:40:50 EDT 2023","port":6443,"state":"ACCEPTED","subjectName":"CN=kube-apiserver","type":"HOST"}
+  # - name: "( {{ ppdm_ip }} ): Accept Cert for Kubernetes cluster {{ cluster_ip }}"
+  #   uri:
+  #     url: "https://{{ ppdm_ip }}:8443/api/v2/certificates/?host={{cluster_ip}}&port={{cluster_port}}&type=Root"
+  #     headers:
+  #       Authorization: "Bearer {{token.json.access_token}}"
+  #       Content-Type: "application/json"
+  #     method: PUT
+  #     validate_certs: no
+  #     return_content: yes
+  #     body_format: json
+  #     body: |
+  #        {"fingerprint":"{{ kube_cert.json[0].fingerprint }}","host":"{{ cluster_ip }}","id":"{{ kube_cert.json[0].id }}","issuerName":"CN=kubernetes","notValidAfter":"Tue Apr 16 22:40:50 EDT 2024","notValidBefore":"Mon Apr 17 22:40:50 EDT 2023","port":6443,"state":"ACCEPTED","subjectName":"CN=kube-apiserver","type":"HOST"}
 
   - name: "Add source for for cluster {{ cluster_ip }} on {{ vmname }}"
     uri:
