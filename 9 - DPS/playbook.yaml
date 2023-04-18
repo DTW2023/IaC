@@ -70,6 +70,10 @@
       timeout: 600
     register: waitforppdm
 
+ - name: Pause for 90 seconds and wait for everyting to stablize
+    ansible.builtin.pause:
+      seconds: 90
+
 # AUTHENTICATE TO THE POWERPROTECT REST API & GRAB ACCESS TOKEN
   - name: "( {{ppdm_ip}} ): Authenticate to PowerProtect DM Rest API"
     uri:
@@ -128,7 +132,7 @@
 #      cmd: "git clone https://github.com/dell/powerprotect-data-manager.git"
 #      chdir: /tmp/ppdm-scripts
 
-  - name: "Set Credentials for Cluster {{ cluster_ip }} on {{ vmname }}"
+  - name: "Add Credentials for Cluster {{ cluster_ip }} on {{ vmname }}"
     uri:
       url: "https://{{ ppdm_ip }}:8443/api/v2/credentials"
       headers:
@@ -140,7 +144,7 @@
       body_format: json
       status_code: 201
       body: |
-        {"type":"KUBERNETES","name":"DTW Kubernetes Cluster","password":"{{ ppdm_token.stdout_lines[0] }}","method":"TOKEN"}
+        {"type":"KUBERNETES","name":"{{ cluster_name }}","password":"{{ ppdm_token.stdout_lines[0] }}","method":"TOKEN"}
     register: kube_creds
 
   - name: kube_creds.json.id
@@ -173,10 +177,10 @@
     debug:
       var: kube_cert.json[0].fingerprint
 
-
-  - name: "Set Up source for {{ cluster_ip }} on {{ vmname }}"
+    
+  - name: "( {{ ppdm_ip }} ): Accept Cert for Kubernetes cluster {{ cluster_ip }}"
     uri:
-      url: "https://{{ ppdm_ip }}:8443/api/v2/inventory-sources"
+      url: "https://{{ ppdm_ip }}:8443/api/v2/certificates/{{ kube_cert.json[0].id }}"
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
@@ -185,14 +189,33 @@
       return_content: yes
       body_format: json
       body: |
-        {"id":"","name":"DTW Kubernetes Cluster","version":"","type":"KUBERNETES","lastDiscovered":"","address":"10.204.20.150","port":6443,"credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
+         {"fingerprint":"{{ kube_cert.json[0].fingerprint }}","host":"{{ cluster_ip }}","id":"{{ kube_cert.json[0].id }}","issuerName":"CN=kubernetes","notValidAfter":"Tue Apr 16 22:40:50 EDT 2024","notValidBefore":"Mon Apr 17 22:40:50 EDT 2023","port":6443,"state":"ACCEPTED","subjectName":"CN=kube-apiserver","type":"HOST"}
+
+  - name: "Add source for for cluster {{ cluster_ip }} on {{ vmname }}"
+    uri:
+      url: "https://{{ ppdm_ip }}:8443/api/v2/inventory-sources"
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      status_code: 201
+      body: |
+        {"id":"","name":"{{ cluster_name }}","version":"","type":"KUBERNETES","lastDiscovered":"","address":"{{ cluster_ip}}","port":"{{ cluster_port }}","credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
     register: kube_source
 
+
+  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
+    ansible.builtin.pause:
+      seconds: 60
+
 #Create a ppdm-snapshot-storage-class-mapping for PPDM in namespace powerprotect
-#  - name: Create Service Account for PPDM
-#    kubernetes.core.k8s:
-#      state: present
-#      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/snapshot-configmap.yaml
+  - name: Create Service Account for PPDM in namespace powerprotect
+    kubernetes.core.k8s:
+      state: present
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/snapshot-configmap.yaml
 
 # LOGOUT OF THE REST API
 #  - name: "( {{ ppdm_ip }}): Logout of the REST API"

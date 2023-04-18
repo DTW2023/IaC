@@ -48,3 +48,28 @@
        force: yes
        state: absent
 
+# delete ppdm namespace
+  - name: Delete  k8s namespace ppdm
+    kubernetes.core.k8s:
+      name: ppdm
+      api_version: v1
+      kind: Namespace
+      state: absent
+
+# delete powerprotect namespace
+  - name: Delete k8s namespace powerprotect
+    kubernetes.core.k8s:
+      name: powerprotect
+      api_version: v1
+      kind: Namespace
+      state: absent
+
+# delete velero-ppdm namespace
+  - name: Delete k8s namespace velero-ppdm
+    kubernetes.core.k8s:
+      name: velero-ppdm
+      api_version: v1
+      kind: Namespace
+      state: absent
+
+
