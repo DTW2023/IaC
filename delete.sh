@@ -34,6 +34,12 @@ cd "1 - PowerStore_Setup"
 ansible-playbook -i inv Delete-Datastore.yaml
 cd ..
 
+
+echo Delete DD and PPDM
+cd "10 - DPS - Part II"
+ansible-playbook delete.yaml
+cd ..
+
 end=`date +%s`
 
 # delete /root/.kube
