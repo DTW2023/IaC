@@ -58,6 +58,32 @@
     debug:
       var: token.json.access_token
 
+
+  - name: "Add VMWARE & KUBERNETES Asset Source on {{ ppdm_ip }}"
+    uri:
+      url: "https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING"
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      status_code: 201
+      body: |
+        {
+          "id": "ASSET_SETTING",
+          "properties": [
+              {
+                  "name": "enabledAssetTypes",
+                  "type": "LIST",
+                  "value": "VMWARE_VIRTUAL_MACHINE,KUBERNETES"
+              }
+        ]
+        }
+    register: asset_sources
+
+
 # create ppdm namespace
   - name: Create a k8s namespace ppdm
     kubernetes.core.k8s:
