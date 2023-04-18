@@ -128,7 +128,7 @@
 #      cmd: "git clone https://github.com/dell/powerprotect-data-manager.git"
 #      chdir: /tmp/ppdm-scripts
 
-  - name: "Set Credentials for {{ cluster_ip }} on {{ vmname }}"
+  - name: "Set Credentials for Cluster {{ cluster_ip }} on {{ vmname }}"
     uri:
       url: "https://{{ ppdm_ip }}:8443/api/v2/credentials"
       headers:
