@@ -16,8 +16,8 @@
   tasks:
 
 
-# DEPLOY THE PPDM IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
-  - name: "Deploy Virtual Machine  {{vmname}}"
+# DELETE THE PPDM IN VCENTER
+  - name: "Delete Virtual Machine  {{vmname}}"
     vmware_guest:
       hostname: "{{ vcenter_host }}"
       username: "{{ vc_username }}"
@@ -31,3 +31,20 @@
       datastore: "{{ vcenter_ds }}"
       force: yes
       state: absent
+
+# DELETE THE DDVE IN VCENTER
+  - name: "Delete Virtual Machine  {{ddvmname}}"
+    vmware_guest:
+       hostname: "{{ vcenter_host }}"
+       username: "{{ vc_username }}"
+       password: "{{ vc_password }}"
+       validate_certs: "{{ validate_certs }}"
+       name: "{{ ddvmname }}"
+       template: "{{ ddvm_template }}"
+       datacenter: "{{ vcenter_dc }}"
+       esxi_hostname: "{{ vcenter_esx }}"
+       folder: 'vm'
+       datastore: "{{ vcenter_ds }}"
+       force: yes
+       state: absent
+

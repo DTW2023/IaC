@@ -1,6 +1,0 @@
-kubectl get volumesnapshotcontent -A
-
-kubectl get volumesnapshot -A
-
-
-kubectl get volumesnapshotclass
