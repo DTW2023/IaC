@@ -30,4 +30,4 @@
 
   - name: run commmand
     debug:
-      msg: run command 'kubectl -n kubernetes-dashboard create token admin-user' then goto https://10.204.20.175/ and use this token "{{ token.stdout_lines[0] }}"
+      msg: run command 'kubectl -n kubernetes-dashboard create token admin-user' then goto https://10.204.20.175/ and use this token {{ token.stdout_lines[0] }}
