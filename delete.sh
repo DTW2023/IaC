@@ -6,7 +6,7 @@ date
 start=`date +%s`
 
 echo delete minecraft server
-cd "8 - Applications/mc"
+cd "9 - Applications/mc"
 ansible-playbook -i inventory delete.yaml
 cd ../..
 
