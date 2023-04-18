@@ -61,7 +61,7 @@
 
   - name: "Add VMWARE & KUBERNETES Asset Source on {{ ppdm_ip }}"
     uri:
-      url: "https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING"
+      url: "https://{{ppdm_ip}}:8443/api/v2/common-settings/ASSET_SETTING"
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
