@@ -70,7 +70,7 @@
       timeout: 600
     register: waitforppdm
 
- - name: Pause for 90 seconds and wait for everyting to stablize
+  - name: Pause for 90 seconds and wait for everyting to stablize
     ansible.builtin.pause:
       seconds: 90
 
