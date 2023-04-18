@@ -92,7 +92,7 @@
   - name: Create Service Account for PPDM
     kubernetes.core.k8s:
       state: present
-      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/PPDM/ppdm-user.yaml
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/ppdm-user.yaml
 
 # Generate Token for PPDM User
   - name: get token
@@ -180,12 +180,6 @@
       body: |
         {"id":"","name":"DTW Kubernetes Cluster","version":"","type":"KUBERNETES","lastDiscovered":"","address":"10.204.20.150","port":6443,"credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
     register: kube_source
-
-#Create a Service Account for PPDM
-#  - name: Create Service Account for PPDM
-#    kubernetes.core.k8s:
-#      state: present
-#      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/ppdm-user.yaml
 
 #Create a ppdm-snapshot-storage-class-mapping for PPDM in namespace powerprotect
 #  - name: Create Service Account for PPDM
