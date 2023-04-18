@@ -163,7 +163,7 @@
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
-      method: GET
+      method: PUT
       validate_certs: no
       return_content: yes
       body_format: json
