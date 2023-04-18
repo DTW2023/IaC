@@ -1,0 +1,71 @@
+{
+    "id": "{{config.json.content[0].id}}",
+    "nodeId": "{{config.json.content[0].nodeId}}",
+       "networks": [
+        {
+          "fqdn": "{{ppdm_host}}.{{ad_domain}}",
+          "ipAddress": [
+              "{{ppdm_ip}}"
+          ],
+          "ipAddressFamily": "{{config.json.content[0].networks[0].ipAddressFamily}}",
+          "interfaceName": "{{config.json.content[0].networks[0].interfaceName}}",
+          "netMask": "{{ppdm_netmask}}",
+          "gateway": "{{ppdm_gateway}}",
+          "dnsServers": [
+              "{{ppdm_dns}}"
+          ],
+          "nslookupSuccess": true
+      },
+      {
+          "ipAddress": [
+              "{{config.json.content[0].networks[1].ipAddress[0]}}"
+          ],
+          "ipAddressFamily": "{{config.json.content[0].networks[1].ipAddressFamily}}",
+          "interfaceName": "{{config.json.content[0].networks[1].interfaceName}}",
+          "netMask": "{{config.json.content[0].networks[1].netMask}}",
+          "prefix": "{{config.json.content[0].networks[1].prefix}}",
+          "ipAddressIpv6": [
+              "{{config.json.content[0].networks[1].ipAddressIpv6[0]}}"
+          ]
+      }
+  ],
+    "ntpServers": [
+        "{{ppdm_ntp}}"
+    ],
+    "timeZone": "{{ppdm_timezone}}",
+    "osUsers": [
+        {
+            "userName": "root",
+            "description": "OS root user account",
+            "numberOfDaysToExpire": 60,
+            "password": "changeme",
+            "newPassword": "{{ppdm_pwd}}"
+        },
+        {
+            "userName": "admin",
+            "description": "OS administrator user account",
+            "numberOfDaysToExpire": 60,
+            "password": "@ppAdm1n",
+            "newPassword": "{{ppdm_pwd}}"
+        },
+        {
+            "userName": "support",
+            "description": "OS support user account",
+            "numberOfDaysToExpire": 60,
+            "password": "$upp0rt!",
+            "newPassword": "{{ppdm_pwd}}"
+        }
+    ],
+    "lockbox": {
+        "name": "Lockbox",
+        "lastUpdatedTime": "{{config.json.content[0].lockbox.lastUpdatedTime}}",
+        "passphrase": "Ch@ngeme1",
+        "newPassphrase": "{{ppdm_pwd}}"
+    },
+    "configType": "standalone",
+    "gettingStartedCompleted": false,
+    "autoSupport": false,
+    "integratedStorageSecuritySetupCompleted": false,
+    "deployedPlatform": "VMWARE",
+    "applicationUserPassword": "{{ppdm_pwd}}"
+  }

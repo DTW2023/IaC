@@ -1,0 +1,217 @@
+---
+# Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
+# also check out https://github.com/dell/ansible-datadomain
+
+- name: "PowerProtect Data Domain & Data Manager stack deployment demo"
+  hosts: localhost
+  collections:
+    - community.vmware
+  become: no
+  gather_facts: false
+
+  vars:
+  vars_files:
+    - credentials.yaml
+
+  tasks:
+  
+# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
+  - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
+    wait_for:
+      host: "{{ppdm_host}}.{{ad_domain}}"
+      port: 443
+      state: started
+      delay: 1
+      sleep: 60
+      timeout: 600
+    register: waitforppdm
+
+# AUTHENTICATE TO THE POWERPROTECT REST API & GRAB ACCESS TOKEN
+  - name: "( {{ppdm_host}} ): Authenticate to PowerProtect DM Rest API"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/login
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body:
+        username: "{{ppdm_id}}"
+        password: "{{ppdm_old_pwd}}"
+      status_code: 200
+    register: token
+    
+  - name:
+    debug:
+      var: token.json.access_token
+
+# ACCEPT THE POWERPROTECT EULA
+  - name: "( {{ppdm_host}} ): Accept the PowerProtect EULA"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/eulas/PPDM
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: PATCH
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body: |
+          {
+            "accepted":true
+          }
+      status_code: 200
+    register: eula
+  
+# GET THE INITIAL CONFIGURATION ID
+  - name: "( {{ppdm_host}} ): Get the initial PowerProtect configuration"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/configurations
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+    register: config
+  
+  - name:
+    debug:
+      var: config.json.content[0].id
+
+# START THE INITIAL CONFIGURATION
+  - name: "( {{ppdm_host}} ): Start the initial PowerProtect configuration - {{config.json.content[0].id}}"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/configurations/{{config.json.content[0].id}}
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: PUT
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body: |
+          {
+            "id": "{{config.json.content[0].id}}",
+            "nodeId": "{{config.json.content[0].nodeId}}",
+               "networks": [
+                {
+                  "fqdn": "{{ppdm_host}}.{{ad_domain}}",
+                  "ipAddress": [
+                      "{{ppdm_ip}}"
+                  ],
+                  "ipAddressFamily": "{{config.json.content[0].networks[0].ipAddressFamily}}",
+                  "interfaceName": "{{config.json.content[0].networks[0].interfaceName}}",
+                  "netMask": "{{ppdm_netmask}}",
+                  "gateway": "{{ppdm_gateway}}",
+                  "dnsServers": [
+                      "{{ppdm_dns}}"
+                  ],
+                  "searchDomains": [
+                        "{{config.json.content[0].searchDomains[0]}}"
+                    ],
+                  "nslookupSuccess": true
+              },
+              {
+                  "ipAddress": [
+                      "{{config.json.content[0].networks[1].ipAddress[0]}}"
+                  ],
+                  "ipAddressFamily": "{{config.json.content[0].networks[1].ipAddressFamily}}",
+                  "interfaceName": "{{config.json.content[0].networks[1].interfaceName}}",
+                  "netMask": "{{config.json.content[0].networks[1].netMask}}",
+                  "prefix": "{{config.json.content[0].networks[1].prefix}}",
+                  "ipAddressIpv6": [
+                      "{{config.json.content[0].networks[1].ipAddressIpv6[0]}}"
+                  ]
+              }
+          ],
+            "ntpServers": [
+                "{{ppdm_ntp}}"
+            ],
+            "timeZone": "{{ppdm_timezone}}",
+            "osUsers": [
+                {
+                    "userName": "root",
+                    "description": "OS root user account",
+                    "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
+                    "password": "changeme",
+                    "newPassword": "{{ppdm_pwd}}"
+                },
+                {
+                    "userName": "admin",
+                    "description": "OS administrator user account",
+                    "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
+                    "password": "@ppAdm1n",
+                    "newPassword": "{{ppdm_pwd}}"
+                },
+                {
+                    "userName": "support",
+                    "description": "OS support user account",
+                    "numberOfDaysToExpire": 60,
+                    "expirationDays": 60,
+                    "remainingExpirationDays": 60,
+                    "password": "$upp0rt!",
+                    "newPassword": "{{ppdm_pwd}}"
+                }
+            ],
+            "lockbox": {
+                "name": "Lockbox",
+                "lastUpdatedTime": "{{config.json.content[0].lockbox.lastUpdatedTime}}",
+                "passphrase": "Ch@ngeme1",
+                "newPassphrase": "{{ppdm_pwd}}"
+            },
+            "configType": "standalone",
+            "gettingStartedCompleted": false,
+            "autoSupport": false,
+            "integratedStorageSecuritySetupCompleted": false,
+            "deployedPlatform": "VMWARE",
+            "applicationUserPassword": "{{ppdm_pwd}}"
+          }
+      status_code: 202
+    register: start_config
+
+# PAUSE THE PLAY FOR 1 MINUTE (BUG in 19.12 INVALIDATES THE TOKEN SO WE WAIT THEN REAUTHENTICATE TO WORK AROUND THE ISSUE)
+  - name: Wait for 1 minute then try to re-authenticate
+    ansible.builtin.pause:
+      minutes: 1
+  
+# REAUTHENTICATE AND GRAB A NEW TOKEN
+  - name: "( {{ppdm_host}} ): Re-authenticate to PowerProtect DM Rest API"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/login
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body:
+        username: "{{ppdm_id}}"
+        password: "{{ppdm_pwd}}"
+      status_code: 200
+    register: token
+    until: token.status == 200
+    retries: 3
+    delay: 60
+
+  - name:
+    debug:
+      var: token.json.access_token
+
+# GET THE CONFIG STATUS
+  - name: "( {{ppdm_host}} ): Check the PowerProtect config status to see if it is complete"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/configurations/{{config.json.content[0].id}}/config-status
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+    register: monitor
+    until: monitor.status == 200 and monitor.json.percentageCompleted == 100
+    retries: 180
+    delay: 10
