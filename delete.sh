@@ -40,10 +40,20 @@ cd "10 - DPS - Part II"
 ansible-playbook delete.yaml
 cd ..
 
-end=`date +%s`
+echo Reset PowerScale
+cd "Misc/PowerScale"
+echo Delete
+ansible-playbook -i inv Deploy-Virtual-Machines.yaml
+echo Deploy
+ansible-playbook -i inv Deploy-Virtual-Machines.yaml
+cd ../..
+
 
 # delete /root/.kube
 rm -rf /root/.kube
+
+end=`date +%s`
+
 
 echo -n "Finished "
 date
