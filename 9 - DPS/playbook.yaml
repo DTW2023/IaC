@@ -58,6 +58,9 @@
        datastore: "{{ vcenter_ds }}"
        state: poweredon
 
+  - name: Pause for 180 seconds and wait for everyting to stablize
+    ansible.builtin.pause:
+      seconds: 180
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
   - name: "( {{ppdm_ip}} ): Wait for HTTPS connectivity"
