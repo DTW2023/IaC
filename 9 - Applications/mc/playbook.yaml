@@ -16,5 +16,5 @@
 
   - name: Deploy Minecraft Statefulset
     when: inventory_hostname in groups['k8s_master']
-    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/8%20-%20Applications/mc/minecraft.yaml"
+    shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20Applications/mc/minecraft.yaml"
 
