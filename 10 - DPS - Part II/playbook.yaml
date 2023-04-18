@@ -182,7 +182,7 @@
       body_format: json
       status_code: 201
       body: |
-        {"id":"","name":"{{ cluster_name }}","version":"","type":"KUBERNETES","lastDiscovered":"","address":"{{ cluster_ip}}","port":"{{ cluster_port }}","credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
+        {"id":"","name":"{{ cluster_name }}","version":"","type":"KUBERNETES","lastDiscovered":"","address":"{{ cluster_ip }}","port":"{{ cluster_port }}","credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
     register: kube_source
 
 
@@ -210,7 +210,7 @@
       status_code: 201
       body: |
         {
-            "name": "{{ namespace }}",
+            "name": "{{ k8s_namespace }}",
             "description": "DTW backing up {{namespace}}",
             "assetType": "KUBERNETES",
             "type": "ACTIVE",
