@@ -196,6 +196,93 @@
       state: present
       src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/snapshot-configmap.yaml
 
+
+  - name: "Add Protection Policy for namespace on Kubernetes cluster {{ cluster_ip }} backing up via {{ ppdm_ip }}"
+    uri:
+      url: "https://{{ ppdm_ip }}:8443/api/v2/protection-policies"
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: POST
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      status_code: 201
+      body: |
+        {
+            "name": "{{ namespace }}",
+            "description": "DTW backing up {{namespace}}",
+            "assetType": "KUBERNETES",
+            "type": "ACTIVE",
+            "encrypted": false,
+            "enabled": true,
+            "priority": 1,
+            "dataConsistency": "CRASH_CONSISTENT",
+            "passive": false,
+            "forceFull": false,
+            "details": {
+                "vm": {
+                    "protectionEngine": "VMDIRECT"
+                }
+            },
+            "stages": [
+                {
+                    "id": "e7184df6-7baa-5f82-8f2b-171aa9e85964",
+                    "type": "PROTECTION",
+                    "passive": false,
+                    "attributes": {},
+                    "target": {
+                        "storageSystemId": "42a8cc0c-89ed-4ff6-a98f-e5036fb6e2b9",
+                        "dataTargetId": null,
+                        "preferredInterface": "{{ ddve_ip }}",
+                        "preferredInterfaceId": "ethV0"
+                    },
+                    "slaId": null,
+                    "sourceStageId": null,
+                    "operations": [
+                        {
+                            "id": "9ed605cb-e14d-c265-b62a-d53391e15e6b",
+                            "backupType": "SYNTHETIC_FULL",
+                            "schedule": {
+                                "frequency": "HOURLY",
+                                "startTime": "2023-04-18T19:00:00.000Z",
+                                "duration": "PT10H",
+                                "interval": 1
+                            }
+                        }
+                    ],
+                    "retention": {
+                        "id": "47f9b875-4f4b-8b7e-3605-7d6e6fb55131",
+                        "unit": "DAY",
+                        "storageSystemRetentionLock": false,
+                        "interval": 1
+                    },
+                    "extendedRetentions": [
+                        {
+                            "selector": {
+                                "operationId": "9ed605cb-e14d-c265-b62a-d53391e15e6b",
+                                "backupType": "SYNTHETIC_FULL"
+                            },
+                            "retention": {
+                                "id": "c7fc2430-5573-b70d-d652-48f5f0f6a4f9",
+                                "storageSystemRetentionLock": false,
+                                "unit": "DAY",
+                                "interval": 1
+                            }
+                        }
+                    ]
+                }
+            ],
+            "filterIds": [],
+            "credentials": null,
+            "slaId": ""
+            }
+    register: kube_pp
+
+
+
+
+
 # LOGOUT OF THE REST API
 #  - name: "( {{ ppdm_ip }}): Logout of the REST API"
 #    uri:
