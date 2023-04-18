@@ -1,6 +1,7 @@
 ---
 # MISC VARIABLES
 ad_domain: storage.local
+# dictacts where we look an ansible server for OVA images
 artifact_path: /var/images
 
 # # POWERPROTECT DD VARIABLES
