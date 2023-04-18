@@ -96,7 +96,7 @@
   - name: Create Service Account for PPDM
     kubernetes.core.k8s:
       state: present
-      src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS/ppdm-user.yaml
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/ppdm-user.yaml
 
 # Generate Token for PPDM User
   - name: get token
