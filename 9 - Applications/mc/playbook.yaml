@@ -10,7 +10,7 @@
   tasks: 
  
  
-  - name: "Create namespace {{ mc_namespace }} on master"
+  - name: "Create MC on master"
     when: inventory_hostname in groups['k8s_master']
     command: "kubectl create ns {{ mc_namespace }}"
 

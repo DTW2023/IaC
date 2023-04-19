@@ -9,7 +9,7 @@
   tasks: 
  
 
-  - name: Deploy Quake Server
+  - name: Deploy QK Server
     when: inventory_hostname in groups['k8s_master']
     shell: "kubectl apply -f https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20Applications/qk/quake.yaml"
 
