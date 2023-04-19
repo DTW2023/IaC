@@ -59,7 +59,7 @@
       var: status
 
 # delete PowerProtect Namespaces
-  - name: Delete k8s namespace ppdm
+  - name: Delete k8s namespaces 
     kubernetes.core.k8s:
       name: "{{ item }}"
       api_version: v1
