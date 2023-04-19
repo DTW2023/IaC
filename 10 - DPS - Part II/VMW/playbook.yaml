@@ -117,7 +117,7 @@
     debug:
       var: accept_vc_cert.json
 
- CREATE VCENTER CREDENTIALS
+ #CREATE VCENTER CREDENTIALS
   - name: "( {{ppdm_host}} ): Create vCenter credentials"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/credentials
