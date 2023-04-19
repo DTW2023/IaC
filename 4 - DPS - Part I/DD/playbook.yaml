@@ -15,6 +15,15 @@
 
   tasks:
 
+# I have cheated here! I have a pre-configured DD that I use and deploy that, to save some time in the demo.
+# However go over to https://github.com/SkunkworksAutomation and this has details on how to deploy from an ova image
+# also the ansible modules from DD work well and are available at https://github.com/dell/ansible-datadomain
+# one thing to note about the ansible modules is nothing to set the "passphrase" check out 
+# https://github.com/SkunkworksAutomation/PowerProtectDD/blob/main/Ansible/ddmc-01.yml line 206
+
+# for all things on https://github.com/SkunkworksAutomation contact clifford.rodriguez@dell.com
+# for the DD modules on https://github.com/dell/ansible-datadomain contact sudarshan.kshirsagar@virtustream.com
+
 
 # DEPLOY THE DDVE IN VCENTER, didn't deploy the OVA because it takes too long configuring SSL keys on first boot
   - name: "Deploy Virtual Machine  {{ddvmname}}"
