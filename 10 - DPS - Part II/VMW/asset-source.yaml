@@ -302,18 +302,20 @@
       var: discovery.json
     when: activitystatus.json.result.status == "FAILED"
 
-
+  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
+    ansible.builtin.pause:
+      seconds: 60
 
 
 # LOGOUT OF THE REST API
-#  - name: "( {{ ppdm_host }}): Logout of the REST API"
-#    uri:
-#      url: "https://{{ ppdm_host }}:8443/api/v2/logout"
-#      headers:
-#        Authorization: "Bearer {{token.json.access_token}}"
-#        Content-Type: "application/json"
-#      method: POST
-#      validate_certs: no
-#      return_content: yes
-#      body_format: json
-#      status_code: 204
+ - name: "( {{ ppdm_host }}): Logout of the REST API"
+   uri:
+     url: "https://{{ ppdm_host }}:8443/api/v2/logout"
+     headers:
+       Authorization: "Bearer {{token.json.access_token}}"
+       Content-Type: "application/json"
+     method: POST
+     validate_certs: no
+     return_content: yes
+     body_format: json
+     status_code: 204
