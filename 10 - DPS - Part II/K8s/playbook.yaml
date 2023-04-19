@@ -15,11 +15,11 @@
     k8s_namesapce: minecraft
     policy_name: POLICY-KUBERNETES-01
 
-
   vars_files:
     - credentials.yaml
 
   tasks:
+
 
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA DOMAIN
   - name: " {{ddvmname}} - Waiting for HTTPS connectivity."
@@ -110,7 +110,7 @@
       status_code: 200
     register: settings
 
-# GET THE K8S CERTIFICATE
+# GET THE VCENTER CERTIFICATE
   - name: "( {{ppdm_host}} ): Get the vCenter Certificate using https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root
@@ -242,6 +242,8 @@
       state: present
       src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/K8s/snapshot-configmap.yaml
 
+
+
 # GET THE ATTACHED POWERPROTECT DD SYSTEM
   - name: "( {{ppdm_host}} ): Get the attached PowerProtect DD system"
     uri:
@@ -254,7 +256,6 @@
       return_content: yes
       body_format: json
     register: storage
-    
 
 # CREATE THE K8s POLICY
   - name: "( {{ppdm_host}} ): Create the protection policy -> POLICY-KUBERNETES-01"
@@ -337,7 +338,7 @@
       status_code: 201
     register: add_rg1_policy
 
-# CREATE THE K8S RULE
+# CREATE THE VIRTUAL MACHINE RULE
   - name: "( {{ppdm_host}} ): Create the protection rule -> RULE-K8S-01"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/protection-rules
@@ -390,8 +391,7 @@
       status_code: 201
     register: add_rg1_rule
 
-
-# GET THE K8s POLICY
+ # GET THE K8s POLICY
   - name: "( {{ppdm_host}} ): Get the virtual machine protection policies equal {{policy_name}}"
     uri:
       #url: https://{{ppdm_host}}:8443/api/v2/protection-policies?filter=name%20eq%20%22{{policy_name}}%25%22
@@ -409,10 +409,6 @@
   - name:
     debug:
       var: policies.json
-
-  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
-    ansible.builtin.pause:
-      seconds: 60
 
 # START K8S BACKUP
   - name: "( {{ppdm_host}} ): Start backup for protection policies eq {{policy_name}}"
