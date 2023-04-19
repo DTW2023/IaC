@@ -55,6 +55,10 @@
     register: policies
     
 
+  - name:
+    debug:
+      var: policies.json
+
 # START K8S BACKUP
   - name: "( {{ppdm_host}} ): Start backup for protection policies eq {{policy_name}}"
     uri:
