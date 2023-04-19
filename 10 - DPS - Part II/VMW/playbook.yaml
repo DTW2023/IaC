@@ -17,7 +17,7 @@
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
   - name: "( {{ppdm_host}} ): Wait for HTTPS connectivity"
     wait_for:
-      host: "{{ppdm_host}}.{{ad_domain}}"
+      host: "{{ppdm_host}}"
       port: 443
       state: started
       delay: 1
