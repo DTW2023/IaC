@@ -12,7 +12,7 @@
     namesapce: minecraft
 
   vars_files:
-    - var/credentials.yaml
+    - credentials.yaml
 
   tasks:
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
