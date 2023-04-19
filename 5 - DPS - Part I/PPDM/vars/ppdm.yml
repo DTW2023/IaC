@@ -18,7 +18,7 @@ ppdm_pwd: "{{ lookup('env', 'VC_PASSWORD') }}"
 ppdm_ip: 10.204.20.176
 ppdm_netmask: 255.255.255.0
 ppdm_gateway: 10.204.20.1
-ppdm_dns: 20.204.20.2
+ppdm_dns: 10.204.20.2
 ppdm_timezone: "US/Eastern - Eastern Standard Time"
 ppdm_ova: dellemc-ppdm-sw-19.13.0-20.ova
 

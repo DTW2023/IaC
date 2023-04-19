@@ -82,7 +82,7 @@
 
 
 # ENABLE VMware and K8s ASSET SOURCE
-  - name: "( {{ppdm_host}} ): Enable vmWARE AND k8S asset source"
+  - name: "( {{ppdm_host}} ): Enable VMware AND k8S asset source"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING
       headers:
@@ -240,7 +240,7 @@
       var: activity.json
 
 # GET THE ACTIVITY STATUS
-  - name: "( {{ppdm_host}} ): Check the VM Inventory Discovery activity status {{ activity.json.content[0].id }}"
+  - name: "( {{ ppdm_host }} ): Check the VM Inventory Discovery activity status {{ activity.json.content[0].id }}"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/activities/{{ activity.json.content[0].id }}
       headers:
@@ -255,6 +255,11 @@
     until: activitystatus.status == 200 and activitystatus.json.progress == 100 and activitystatus.json.state == 'COMPLETED'
     retries: 180
     delay: 10
+
+
+  - name:
+    debug:
+      var: activitystatus
 
   - name:
     debug:
