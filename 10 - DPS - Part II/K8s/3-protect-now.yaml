@@ -44,7 +44,8 @@
 # GET THE K8s POLICY
   - name: "( {{ppdm_host}} ): Get the virtual machine protection policies equal {{policy_name}}"
     uri:
-      url: https://{{ppdm_host}}:8443/api/v2/protection-policies?filter=name%20eq%20%22{{policy_name}}%25%22
+      #url: https://{{ppdm_host}}:8443/api/v2/protection-policies?filter=name%20eq%20%22{{policy_name}}%25%22
+      url: https://{{ppdm_host}}:8443/api/v2/protection-policies?filter=name%20eq%20%22{{policy_name}}%22
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
