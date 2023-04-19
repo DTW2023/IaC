@@ -86,6 +86,11 @@
     with_items: "{{ policies.json.content | json_query( '[*]' ) }}"
     register: start_backups
 
+  name:
+  debug:
+    var: start_backups.json
+
+
 # LOGOUT OF THE REST API
   - name: "( {{ppdm_host}}): Logout of the REST API"
     uri:
