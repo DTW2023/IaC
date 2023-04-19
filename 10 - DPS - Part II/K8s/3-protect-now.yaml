@@ -52,7 +52,7 @@
       validate_certs: no
       return_content: yes
       body_format: json
-      register: policies
+    register: policies
     
 
 # START K8S BACKUP
