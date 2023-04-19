@@ -358,3 +358,7 @@
       return_content: yes
       body_format: json
       status_code: 204
+
+  - name: "Pause for 120 seconds to let everything stablize"
+    ansible.builtin.pause:
+      seconds: 120
