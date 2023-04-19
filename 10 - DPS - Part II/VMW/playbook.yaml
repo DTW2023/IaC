@@ -1,6 +1,6 @@
 ---
 - name: "PowerProtect Data Manager policy and rule creation demo"
-  hosts: "{{ ansible_play_batch }}"
+  hosts: localhost
   collections:
     - community.general
   become: no
