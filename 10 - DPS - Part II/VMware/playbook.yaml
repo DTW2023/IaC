@@ -16,7 +16,7 @@
     policy_name: POLICY-VM01
 
   vars_files:
-    - credentials.yaml
+    - var/credentials.yaml
 
 
   tasks:
