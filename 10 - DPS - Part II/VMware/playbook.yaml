@@ -9,13 +9,15 @@
   become: no
   gather_facts: false
 
+
   vars:
   # Generate  unqiue uuid for POLICY-VM01
     rg1_uuid: "{{ lookup( 'password', '/dev/null length=32' ) | to_uuid }}"
     policy_name: POLICY-VM01
-	
+
   vars_files:
-    - var/credentials.yaml
+    - credentials.yaml
+
 
   tasks:
 
