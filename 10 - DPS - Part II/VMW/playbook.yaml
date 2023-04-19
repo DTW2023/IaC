@@ -256,11 +256,6 @@
     retries: 180
     delay: 10
 
-
-  - name:
-    debug:
-      var: activitystatus
-
   - name:
     debug:
       var: activitystatus.json
@@ -304,6 +299,7 @@
   - name:
     debug:
       var: discovery.json
+    when: activitystatus.json.result.status == "FAILED"
 
 
 
