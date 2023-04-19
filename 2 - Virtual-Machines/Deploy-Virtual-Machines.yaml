@@ -17,7 +17,7 @@
         username: "{{ vc_username }}"
         password: "{{vc_password }}"
         validate_certs: "{{ validate_certs }}"
-        name: "{{ item.host_name }}"
+        name: "DTW-{{ item.host_name }}"
         template: "{{ item.vm_template }}"
         datacenter: "{{ item.datacenter }}"
         esxi_hostname: "{{ item.esxi_host }}"
