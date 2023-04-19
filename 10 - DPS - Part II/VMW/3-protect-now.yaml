@@ -9,7 +9,7 @@
   vars:
     policy_name: POLICY-VM01
   vars_files:
-    - vars/credentials.yaml
+    - var/credentials.yaml
 
   tasks:
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
