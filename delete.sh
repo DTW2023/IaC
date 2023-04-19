@@ -43,7 +43,7 @@ cd ..
 echo Reset PowerScale
 cd "Misc/PowerScale"
 echo Delete
-ansible-playbook -i inv Deploy-Virtual-Machines.yaml
+ansible-playbook -i inv Delete-Virtual-Machines.yaml
 echo Deploy
 ansible-playbook -i inv Deploy-Virtual-Machines.yaml
 cd ../..
