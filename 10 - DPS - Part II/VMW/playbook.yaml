@@ -80,6 +80,33 @@
     retries: 180
     delay: 10
 
+
+# ENABLE VMware and K8s ASSET SOURCE
+  - name: "( {{ppdm_host}} ): Enable vmWARE AND k8S asset source"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: PUT
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body: |
+          {
+              "id": "ASSET_SETTING",
+              "properties": [
+                  {
+                      "name": "enabledAssetTypes",
+                      "type": "LIST",
+                      "value": "VMWARE_VIRTUAL_MACHINE,KUBERNETES"
+                  }
+              ]
+          }
+      status_code: 200
+    register: settings
+    
+
 # GET THE VCENTER CERTIFICATE
   - name: "( {{ppdm_host}} ): Get the vCenter Certificate using https://{{ppdm_host}}:8443/api/v2/certificates?host={{vcenter_host}}&port=443&type=Host"
     uri:
@@ -91,15 +118,15 @@
       validate_certs: no
       return_content: yes
       body_format: json
-      status_code: 200
+      #status_code: 200
     register: vc_cert
-    until: vc_cert.status == 200
-    retries: 90
-    delay: 10
+    # until: vc_cert.status == 200
+    # retries: 90
+    # delay: 10
 
-  - name:
-    debug:
-      var: vc_cert.json[0]
+  # - name:
+  #   debug:
+  #     var: vc_cert.json[0]
 
 # ACCEPT THE VCENTER CERTIFICATE
   - name: "( {{ppdm_host}} ): Accept the vCenter certificate"
@@ -192,30 +219,7 @@
     debug:
       var: vcenter.json
 
-# ENABLE VMware and K8s ASSET SOURCE
-  - name: "( {{ppdm_host}} ): Enable vmWARE AND k8S asset source"
-    uri:
-      url: https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING
-      headers:
-        Authorization: "Bearer {{token.json.access_token}}"
-        Content-Type: "application/json"
-      method: PUT
-      validate_certs: no
-      return_content: yes
-      body_format: json
-      body: |
-          {
-              "id": "ASSET_SETTING",
-              "properties": [
-                  {
-                      "name": "enabledAssetTypes",
-                      "type": "LIST",
-                      "value": "VMWARE_VIRTUAL_MACHINE,KUBERNETES"
-                  }
-              ]
-          }
-      status_code: 200
-    register: settings
+
     
 
 # GET THE ACTIVITY FOR THE VCENTER DISCOVERY
