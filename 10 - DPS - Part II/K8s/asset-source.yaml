@@ -2,7 +2,7 @@
 # Thanks to clifford.rodriguez@dell.com and go to https://github.com/SkunkworksAutomation for all automation things for DPS
 # also check out https://github.com/dell/ansible-datadomain
 
-- name: "Configure PPDM to Backup minecraft namespace and Virtual Machines master, worker-01, worker-02, worker-03"
+- name: "Configure PPDM to add asset source for Kubernetes"
   hosts: localhost
   collections:
     - community.vmware
