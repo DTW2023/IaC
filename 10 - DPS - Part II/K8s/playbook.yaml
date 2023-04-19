@@ -440,7 +440,9 @@
     with_items: "{{ policies.json.content | json_query( '[*]' ) }}"
     register: start_backups
 
-
+  - name: "Pause for 60 seconds"
+    ansible.builtin.pause:
+      seconds: 60
 
 
 # LOGOUT OF THE REST API
