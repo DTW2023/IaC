@@ -9,7 +9,7 @@
   vars:
     policy_name: POLICY-KUBERNETES-01
   vars_files:
-    - var/credentials.yaml
+    - credentials.yaml
 
   tasks:
 # WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER  
