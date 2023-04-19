@@ -541,3 +541,7 @@
       return_content: yes
       body_format: json
       status_code: 204
+
+  - name: "Pause for 60 seconds"
+    ansible.builtin.pause:
+      seconds: 60    
