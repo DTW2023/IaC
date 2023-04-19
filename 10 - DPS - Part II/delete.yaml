@@ -48,28 +48,28 @@
        force: yes
        state: absent
 
-# delete ppdm namespace
-  - name: Delete  k8s namespace ppdm
-    kubernetes.core.k8s:
-      name: ppdm
-      api_version: v1
-      kind: Namespace
-      state: absent
+  - name: "check master ({{ cluster_ip }}) is pingable"
+    ansible.builtin.ping:
+    delegate_to: "{{ cluster_ip }}"
+    register: status
+    ignore_unreachable: true
 
-# delete powerprotect namespace
-  - name: Delete k8s namespace powerprotect
-    kubernetes.core.k8s:
-      name: powerprotect
-      api_version: v1
-      kind: Namespace
-      state: absent
+  - name: "status from pinging {{ cluster_ip }}"
+    debug:
+      var: status
 
-# delete velero-ppdm namespace
-  - name: Delete k8s namespace velero-ppdm
+# delete PowerProtect Namespaces
+  - name: Delete k8s namespace ppdm
     kubernetes.core.k8s:
-      name: velero-ppdm
+      name: "{{ item }}"
       api_version: v1
       kind: Namespace
       state: absent
+    when: status.ping is defined
+    loop:
+       - powerprotect
+       - ppdm
+       - velero-ppdm
+       
 
 
