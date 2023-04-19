@@ -242,6 +242,19 @@
       state: present
       src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/K8s/snapshot-configmap.yaml
 
+# GET THE ATTACHED POWERPROTECT DD SYSTEM
+  - name: "( {{ppdm_host}} ): Get the attached PowerProtect DD system"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/storage-systems?filter=type%20eq%20%22DATA_DOMAIN_SYSTEM%22%20and%20name%20eq%20%22{{ddve_host}}.{{ad_domain}}%22
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+    register: storage
+    
 
 # CREATE THE K8s POLICY
   - name: "( {{ppdm_host}} ): Create the protection policy -> POLICY-KUBERNETES-01"
@@ -396,6 +409,10 @@
   - name:
     debug:
       var: policies.json
+
+  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
+    ansible.builtin.pause:
+      seconds: 60
 
 # START K8S BACKUP
   - name: "( {{ppdm_host}} ): Start backup for protection policies eq {{policy_name}}"
