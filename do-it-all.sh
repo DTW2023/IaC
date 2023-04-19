@@ -101,4 +101,4 @@ echo -n "Finished "
 end=`date +%s`
 runtime=$((end-start))
 echo Took $runtime seconds to deploy Data Protection
-echo "
+echo ""
