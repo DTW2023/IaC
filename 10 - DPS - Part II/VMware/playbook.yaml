@@ -476,6 +476,11 @@
       status_code: 201
     register: add_rg1_rule
 
+  - name: "Pause for 60 seconds"
+    ansible.builtin.pause:
+      seconds: 60
+
+
 # GET THE VIRTUAL MACHINE POLICY
   - name: "( {{ppdm_host}} ): Get the virtual machine protection policies LIKE {{policy_name}}"
     uri:
