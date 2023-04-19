@@ -449,7 +449,7 @@
                           "unit": "DAY"
                       },
                       "operation": {
-                          "backupType": "FULL"
+                          "backupType": "SYNTHETIC_FULL"
                       }
                   }
               ]
