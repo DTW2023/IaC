@@ -12,6 +12,8 @@
   vars:
   # Generate  unqiue uuid for POLICY-VM01
     rg1_uuid: "{{ lookup( 'password', '/dev/null length=32' ) | to_uuid }}"
+    policy_name: POLICY-VM01
+
 
   vars_files:
     - var/credentials.yaml
@@ -305,7 +307,7 @@
       var: discovery.json
     when: activitystatus.json.result.status == "FAILED"
 
-  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
+  - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ vcenter_cluster }}"
     ansible.builtin.pause:
       seconds: 60
 
@@ -475,7 +477,7 @@
     register: add_rg1_rule
 
 
-  - name: "Pause for 60 seconds for policy setup for {{ cluster_name }}"
+  - name: "Pause for 60 seconds for policy setup for {{ vcenter_cluster }}"
     ansible.builtin.pause:
       seconds: 60
 
