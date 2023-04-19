@@ -9,7 +9,7 @@
   vars:
   # Generate  unqiue uuid for POLICY-VM01
     rg1_uuid: "{{ lookup( 'password', '/dev/null length=32' ) | to_uuid }}"
-    namesapce: minecraft
+    k8s_namesapce: minecraft
 
   vars_files:
     - credentials.yaml
@@ -160,7 +160,7 @@
             "rules": [
                 {
                     "name": "sub1_RULE-K8S-01",
-                    "description": "Protect {{ namespace }} namespace",
+                    "description": "Protect {{ k8s_namespace }} namespace",
                     "action": null,
                     "actionResult": null,
                     "category": "PRIMITIVE",
