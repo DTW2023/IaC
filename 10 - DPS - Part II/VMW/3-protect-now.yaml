@@ -1,6 +1,6 @@
 ---
 - name: "PowerProtect Data Manager image backup demo"
-  hosts: "{{ ansible_play_batch }}"
+  hosts: localhost
   collections:
     - community.general
   become: no
