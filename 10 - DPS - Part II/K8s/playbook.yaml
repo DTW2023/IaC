@@ -27,18 +27,7 @@
       timeout: 600
     register: waitforddve
 
-
-# WAIT FOR HTTPS RESPONSE FROM POWERPROTECT DATA MANAGER
-  - name: "( {{ppdm_ip}} ): Wait for HTTPS connectivity"
-    wait_for:
-      host: "{{ppdm_ip}}"
-      port: 443
-      state: started
-      delay: 1
-      sleep: 60
-      timeout: 600
-    register: waitforppdm
-    
+   
 
 # AUTHENTICATE TO THE POWERPROTECT REST API & GRAB ACCESS TOKEN
   - name: "( {{ppdm_ip}} ): Authenticate to PowerProtect DM Rest API"
@@ -58,10 +47,43 @@
     debug:
       var: token.json.access_token
 
-
-  - name: "Add VMWARE & KUBERNETES Asset Source on {{ ppdm_ip }}"
+# GET THE INITIAL CONFIGURATION ID
+  - name: "( {{ppdm_host}} ): Get the initial PowerProtect configuration"
     uri:
-      url: "https://{{ppdm_ip}}:8443/api/v2/common-settings/ASSET_SETTING"
+      url: https://{{ppdm_host}}:8443/api/v2/configurations
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+    register: config
+
+  - name:
+    debug:
+      var: config.json.content[0].id
+
+# GET THE CONFIG STATUS
+  - name: "( {{ppdm_host}} ): Check the PowerProtect config status to see if it is complete"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/configurations/{{config.json.content[0].id}}/config-status
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+    register: monitor
+    until: monitor.status == 200 and monitor.json.percentageCompleted == 100
+    retries: 180
+    delay: 10
+
+# ENABLE VMware and K8s ASSET SOURCE
+  - name: "( {{ppdm_host}} ): Enable VMware AND k8S asset source"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/common-settings/ASSET_SETTING
       headers:
         Authorization: "Bearer {{token.json.access_token}}"
         Content-Type: "application/json"
@@ -69,20 +91,75 @@
       validate_certs: no
       return_content: yes
       body_format: json
-      status_code: 200
       body: |
-        {
-          "id": "ASSET_SETTING",
-          "properties": [
-              {
-                  "name": "enabledAssetTypes",
-                  "type": "LIST",
-                  "value": "VMWARE_VIRTUAL_MACHINE,KUBERNETES"
-              }
-        ]
-        }
-    register: asset_sources
+          {
+              "id": "ASSET_SETTING",
+              "properties": [
+                  {
+                      "name": "enabledAssetTypes",
+                      "type": "LIST",
+                      "value": "VMWARE_VIRTUAL_MACHINE,KUBERNETES"
+                  }
+              ]
+          }
+      status_code: 200
+    register: settings
 
+# GET THE VCENTER CERTIFICATE
+  - name: "( {{ppdm_host}} ): Get the vCenter Certificate using https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root
+      #https://{{ ppdm_ip }}:8443/api/v2/certificates?host={{ cluster_ip }}&port={{ cluster_port }}&type=Root
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: GET
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      #status_code: 200
+    register: k8_cert
+    # until: k8_cert.status == 200
+    # retries: 90
+    # delay: 10
+
+  # - name:
+  #   debug:
+  #     var: k8_cert.json[0]
+
+# ACCEPT THE  CERTIFICATE
+  - name: "( {{ppdm_host}} ): Accept the Kubernetes certificate"
+    uri:
+      url: https://{{ppdm_host}}:8443/api/v2/certificates/{{k8_cert.json[0].id}}
+      headers:
+        Authorization: "Bearer {{token.json.access_token}}"
+        Content-Type: "application/json"
+      method: PUT
+      validate_certs: no
+      return_content: yes
+      body_format: json
+      body: |
+          {
+            "fingerprint": "{{k8_cert.json[0].fingerprint}}",
+            "host": "{{k8_cert.json[0].host}}",
+            "id": "{{k8_cert.json[0].id}}",
+            "issuerName": "{{k8_cert.json[0].issuerName}}",
+            "notValidAfter": "{{k8_cert.json[0].notValidAfter}}",
+            "notValidBefore": "{{k8_cert.json[0].notValidBefore}}",
+            "port": "{{k8_cert.json[0].port}}",
+            "state": "ACCEPTED",
+            "subjectName": "{{k8_cert.json[0].subjectName}}",
+            "type": "{{k8_cert.json[0].type}}"
+          }
+      status_code: 200
+    register: accept_k8_cert
+    until: accept_k8_cert.status == 200
+    retries: 90
+    delay: 10
+
+  - name:
+    debug:
+      var: accept_k8_cert.json
 
 # create ppdm namespace
   - name: Create a k8s namespace ppdm
@@ -96,7 +173,7 @@
   - name: Create Service Account for PPDM
     kubernetes.core.k8s:
       state: present
-      src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/ppdm-user.yaml
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/K8s/ppdm-user.yaml
 
 # Generate Token for PPDM User
   - name: get token
@@ -118,57 +195,18 @@
       validate_certs: no
       return_content: yes
       body_format: json
-      status_code: 201
+      status_code: [200,201,403]
       body: |
         {"type":"KUBERNETES","name":"{{ cluster_name }}","password":"{{ ppdm_token.stdout_lines[0] }}","method":"TOKEN"}
     register: kube_creds
+    until: kube_creds.status == 200 or kube_creds.status == 201 or kube_creds.status == 403
+    retries: 90
+    delay: 10
 
-  - name: kube_creds.json.id
+  - name: kube_creds.json
     debug:
-      var: kube_creds.json.id
+      var: kube_creds.json
 
-  - name: kube_creds.json.secretId
-    debug:
-      var: kube_creds.json.secretId
-
-
-
-  - name: "( {{ ppdm_ip }} ): Get Cert for Kubernetes cluster {{ cluster_ip }}"
-    uri:
-      url: "https://{{ ppdm_ip }}:8443/api/v2/certificates?host={{ cluster_ip }}&port={{ cluster_port }}&type=Root"
-      headers:
-        Authorization: "Bearer {{token.json.access_token}}"
-        Content-Type: "application/json"
-      method: GET
-      validate_certs: no
-      return_content: yes
-      # body: |
-    register: kube_cert
-
-  - name: kube_cert id
-    debug:
-      var: kube_cert.json[0].id
-
-  - name: kube_cert fingerprint
-    debug:
-      var: kube_cert.json[0].fingerprint
-
-
-
-
-    
-  # - name: "( {{ ppdm_ip }} ): Accept Cert for Kubernetes cluster {{ cluster_ip }}"
-  #   uri:
-  #     url: "https://{{ ppdm_ip }}:8443/api/v2/certificates/?host={{cluster_ip}}&port={{cluster_port}}&type=Root"
-  #     headers:
-  #       Authorization: "Bearer {{token.json.access_token}}"
-  #       Content-Type: "application/json"
-  #     method: PUT
-  #     validate_certs: no
-  #     return_content: yes
-  #     body_format: json
-  #     body: |
-  #        {"fingerprint":"{{ kube_cert.json[0].fingerprint }}","host":"{{ cluster_ip }}","id":"{{ kube_cert.json[0].id }}","issuerName":"CN=kubernetes","notValidAfter":"Tue Apr 16 22:40:50 EDT 2024","notValidBefore":"Mon Apr 17 22:40:50 EDT 2023","port":6443,"state":"ACCEPTED","subjectName":"CN=kube-apiserver","type":"HOST"}
 
   - name: "Add cluster {{ cluster_ip }} as a source on {{ vmname }}"
     uri:
@@ -185,6 +223,9 @@
         {"id":"","name":"{{ cluster_name }}","version":"","type":"KUBERNETES","lastDiscovered":"","address":"{{ cluster_ip }}","port":"{{ cluster_port }}","credentials":{"id":"{{ kube_creds.json.id }}"},"ssl":false,"details":{"k8s":{"vCenterId":null,"distributionType":"NON_VSPHERE","configurations":[]}},"_links":{}}
     register: kube_source
 
+  - name:
+    debug:
+      var: kube_source.json
 
   - name: "Pause for 60 seconds for Initial Discovery for inventory source {{ cluster_name }}"
     ansible.builtin.pause:
@@ -194,93 +235,7 @@
   - name: Create Service Account for PPDM in namespace powerprotect
     kubernetes.core.k8s:
       state: present
-      src: https://raw.githubusercontent.com/DTW2023/IaC/main/9%20-%20DPS/snapshot-configmap.yaml
-
-
-  - name: "Add Protection Policy for namespace on Kubernetes cluster {{ cluster_ip }} backing up via {{ ppdm_ip }}"
-    uri:
-      url: "https://{{ ppdm_ip }}:8443/api/v2/protection-policies"
-      headers:
-        Authorization: "Bearer {{token.json.access_token}}"
-        Content-Type: "application/json"
-      method: POST
-      validate_certs: no
-      return_content: yes
-      body_format: json
-      status_code: 201
-      body: |
-        {
-            "name": "{{ k8s_namespace }}",
-            "description": "DTW backing up {{namespace}}",
-            "assetType": "KUBERNETES",
-            "type": "ACTIVE",
-            "encrypted": false,
-            "enabled": true,
-            "priority": 1,
-            "dataConsistency": "CRASH_CONSISTENT",
-            "passive": false,
-            "forceFull": false,
-            "details": {
-                "vm": {
-                    "protectionEngine": "VMDIRECT"
-                }
-            },
-            "stages": [
-                {
-                    "id": "e7184df6-7baa-5f82-8f2b-171aa9e85964",
-                    "type": "PROTECTION",
-                    "passive": false,
-                    "attributes": {},
-                    "target": {
-                        "storageSystemId": "42a8cc0c-89ed-4ff6-a98f-e5036fb6e2b9",
-                        "dataTargetId": null,
-                        "preferredInterface": "{{ ddve_ip }}",
-                        "preferredInterfaceId": "ethV0"
-                    },
-                    "slaId": null,
-                    "sourceStageId": null,
-                    "operations": [
-                        {
-                            "id": "9ed605cb-e14d-c265-b62a-d53391e15e6b",
-                            "backupType": "SYNTHETIC_FULL",
-                            "schedule": {
-                                "frequency": "HOURLY",
-                                "startTime": "2023-04-18T19:00:00.000Z",
-                                "duration": "PT10H",
-                                "interval": 1
-                            }
-                        }
-                    ],
-                    "retention": {
-                        "id": "47f9b875-4f4b-8b7e-3605-7d6e6fb55131",
-                        "unit": "DAY",
-                        "storageSystemRetentionLock": false,
-                        "interval": 1
-                    },
-                    "extendedRetentions": [
-                        {
-                            "selector": {
-                                "operationId": "9ed605cb-e14d-c265-b62a-d53391e15e6b",
-                                "backupType": "SYNTHETIC_FULL"
-                            },
-                            "retention": {
-                                "id": "c7fc2430-5573-b70d-d652-48f5f0f6a4f9",
-                                "storageSystemRetentionLock": false,
-                                "unit": "DAY",
-                                "interval": 1
-                            }
-                        }
-                    ]
-                }
-            ],
-            "filterIds": [],
-            "credentials": null,
-            "slaId": ""
-            }
-    register: kube_pp
-
-
-
+      src: https://raw.githubusercontent.com/DTW2023/IaC/main/10%20-%20DPS%20-%20Part%20II/K8s/snapshot-configmap.yaml
 
 
 # LOGOUT OF THE REST API
