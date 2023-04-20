@@ -10,10 +10,11 @@
   gather_facts: false
 
   vars:
-  # Generate  unqiue uuid for POLICY-VM01
+  # Generate  unqiue uuid for POLICY-KUBERNETES-01
     rg1_uuid: "{{ lookup( 'password', '/dev/null length=32' ) | to_uuid }}"
     k8s_namespace: minecraft
     policy_name: POLICY-KUBERNETES-01
+    rule: RULE-K8S-01
 
   vars_files:
     - credentials.yaml
@@ -110,7 +111,7 @@
       status_code: 200
     register: settings
 
-# GET THE VCENTER CERTIFICATE
+# GET THE K8S CERTIFICATE
   - name: "( {{ppdm_host}} ): Get the vCenter Certificate using https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/certificates?host={{cluster_ip}}&port={{cluster_port}}&type=Root
@@ -190,6 +191,7 @@
     debug:
       var: ppdm_token.stdout_lines[0]
 
+# Add Credentials for K8s  Cluster 
   - name: "Add Credentials for Cluster {{ cluster_ip }} on {{ vmname }}"
     uri:
       url: "https://{{ ppdm_ip }}:8443/api/v2/credentials"
@@ -212,7 +214,7 @@
     debug:
       var: kube_creds.json
 
-
+# Add K8s Cluster as a source
   - name: "Add cluster {{ cluster_ip }} as a source on {{ vmname }}"
     uri:
       url: "https://{{ ppdm_ip }}:8443/api/v2/inventory-sources"
@@ -339,7 +341,7 @@
     register: add_rg1_policy
 
 # CREATE THE K8S RULE
-  - name: "( {{ppdm_host}} ): Create the protection rule -> RULE-K8S-01"
+  - name: "( {{ppdm_host}} ): Create the protection rule -> {{ rule }}"
     uri:
       url: https://{{ppdm_host}}:8443/api/v2/protection-rules
       headers:
@@ -351,7 +353,7 @@
       body_format: json
       body: |
         {
-            "name": "RULE-K8S-01",
+            "name": "{{ rule }}",
             "description": "Protect Kubernetes Namespaces",
             "action": "MOVE_TO_GROUP",
             "actionResult": "{{add_rg1_policy.json.id}}",
@@ -359,7 +361,7 @@
             "category": "COMPOUND",
             "rules": [
                 {
-                    "name": "sub1_RULE-K8S-01",
+                    "name": "sub1_{{ rule }}",
                     "description": "Protect {{ k8s_namespace }} namespace",
                     "action": null,
                     "actionResult": null,
