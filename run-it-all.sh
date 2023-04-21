@@ -81,7 +81,7 @@ cd ..
 echo Generate some load 
 cd "8 - Generate Load"
 sh ./run.sh
-kubectl scale --replicas=5 statefulset.apps/fio -n fio-powwerscale
+kubectl scale --replicas=5 statefulset.apps/fio -n fio-powerscale
 kubectl scale --replicas=5 statefulset.apps/fio -n fio-powerstore-ext4
 cd ..
 
