@@ -19,6 +19,7 @@ spec:
     spec:
       containers:
         - name: mc
+          imagePullPolicy: IfNotPresent
           image: itzg/minecraft-server
           env:
             - name: EULA
