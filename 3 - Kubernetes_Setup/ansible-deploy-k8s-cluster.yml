@@ -6,6 +6,10 @@
   become: true
   tasks:
 
+
+  - name: Check ALL hosts are up
+    ansible.builtin.ping:
+
   - name: Yum Check Update
     command: yum check update
 
