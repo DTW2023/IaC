@@ -6,6 +6,9 @@
   become: true
   tasks:
 
+  vars:
+  vars_files:
+    - vars.yaml
 
   - name: Check ALL hosts are up
     ansible.builtin.ping:
@@ -208,6 +211,10 @@
     ansible.builtin.file:
       path: /tmp/networking.sh
       state: absent
+
+  - name: change ip range for metallb
+    when: inventory_hostname in groups['k8s_master']
+    shell: kubectl get ipaddresspool.metallb.io/first-pool -n metallb-system -o yaml | sed -e "s/10.204.20.171-192.168.1.175/{{ iprange }}/" | kubectl apply -f - -n metallb-system
 
   - name: Install OLM on master
     when: inventory_hostname in groups['k8s_master']
