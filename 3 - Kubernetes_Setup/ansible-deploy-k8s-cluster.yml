@@ -213,6 +213,7 @@
       path: /tmp/networking.sh
       state: absent
 
+# Added this for kubernetes labs, so we can change easily for multiple clusters rolled out on same subnet
   - name: change ip range for metallb
     when: inventory_hostname in groups['k8s_master']
     shell: kubectl get ipaddresspool.metallb.io/first-pool -n metallb-system -o yaml | sed -e "s/10.204.20.171-10.204.20.175/{{ iprange }}/" | kubectl apply -f - -n metallb-system
