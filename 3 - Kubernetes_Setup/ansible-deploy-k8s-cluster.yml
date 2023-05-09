@@ -4,11 +4,12 @@
 
 - hosts: all
   become: true
-  tasks:
 
   vars:
   vars_files:
     - vars.yaml
+
+  tasks:
 
   - name: Check ALL hosts are up
     ansible.builtin.ping:
