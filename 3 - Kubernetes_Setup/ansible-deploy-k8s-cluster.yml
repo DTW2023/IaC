@@ -11,8 +11,18 @@
 
   tasks:
 
-  - name: Check ALL hosts are up
-    ansible.builtin.ping:
+#  - name: Check ALL hosts are up
+#    ansible.builtin.ping:
+
+  - name: Wait until all hosts are pingable
+    wait_for:
+      host: "{{ item }}"
+      state: started
+      port: 22
+      timeout: 30
+      delay: 5
+    loop: "{{ groups['all'] }}"
+
 
   - name: Yum Check Update
     command: yum check update
